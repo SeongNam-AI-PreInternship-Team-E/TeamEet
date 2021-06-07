@@ -1,0 +1,7 @@
+Django==3.1.4
+pymysql
+jsonify
+requests
+cryptography
+gunicorn==20.0.4
+#  spsycopg2-binary==2.8.5
