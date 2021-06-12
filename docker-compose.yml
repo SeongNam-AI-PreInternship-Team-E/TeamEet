@@ -1,6 +1,23 @@
-version: "3.8"
+version: "3.3"
 
 services:
+  mysql_db:
+    platform: linux/x86_64 #error solved when using m1
+    image: mysql:latest
+    restart: always
+    networks:
+      - app-tier
+    volumes:
+      - ./mysql/db:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    cap_add:
+      - SYS_NICE
+    environment:
+      - MYSQL_DATABASE=app
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=1234
+      - MYSQL_ROOT_PASSWORD=1234
   web:
     build:
       context: .
