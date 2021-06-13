@@ -35,6 +35,10 @@ RUN /bin/bash -c "source env/bin/activate"
 COPY ./backend/requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
+RUN apt-get install libmysqlclient-dev -y
+RUN apt-get install gcc -y 
+RUN pip install mysqlclient
+
 EXPOSE 8000
 #COPY . .
 
