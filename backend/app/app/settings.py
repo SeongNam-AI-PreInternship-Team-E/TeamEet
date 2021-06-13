@@ -95,8 +95,8 @@ else:
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'teameet',
             'USER': 'admin',
-            'PASSWORD': 'YRnD1zMUxzCiRhQJ0BHm',
-            'HOST': 'database-1.cluster-cdihlcooafvr.ap-northeast-2.rds.amazonaws.com',
+            'PASSWORD': 'TgI5cDXTprprsXQCOusW',
+            'HOST': 'database-2.cluster-cdihlcooafvr.ap-northeast-2.rds.amazonaws.com',
             'PORT': '3306',
             'OPTIONS': {
                 'init_command': 'SET sql_mode="STRICT_TRANS_TABLES"'
