@@ -33,6 +33,28 @@ services:
     env_file:
       - ./backend/.env.dev
 
+  migration:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    # image: app
+    command: sh -c "python3 manage.py migrate"
+    volumes:
+      - ./backend/app:/app
+    # links:
+    #     - mysql_db
+    depends_on:
+      - make_migrations
+
+  make_migrations:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    # image: app
+    command: sh -c "python3 manage.py makemigrations"
+    volumes:
+      - ./backend/app:/app
+
 networks:
   app-tier:
     driver: bridge
