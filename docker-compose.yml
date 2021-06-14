@@ -21,7 +21,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: ./backend/Dockerfile
+      dockerfile: ./backend/app/Dockerfile
     ports:
       - 8000:8000
     # command: python manage.py runserver 127.0.0.1:8000
@@ -31,14 +31,20 @@ services:
     volumes:
       - ./backend/app:/app
     env_file:
-      - ./backend/.env.dev
+      # - ./backend/.env.dev
+      - ./backend/.env
+    # environment:
+    #   - SECRET_KEY=${SECRET_KEY}
 
   migration:
     build:
       context: .
-      dockerfile: ./backend/Dockerfile
+      dockerfile: ./backend/app/Dockerfile
     # image: app
     command: sh -c "python3 manage.py migrate"
+    env_file:
+      # - ./backend/.env.dev
+      - ./backend/.env
     volumes:
       - ./backend/app:/app
     # links:
@@ -49,9 +55,12 @@ services:
   make_migrations:
     build:
       context: .
-      dockerfile: ./backend/Dockerfile
+      dockerfile: ./backend/app/Dockerfile
     # image: app
     command: sh -c "python3 manage.py makemigrations"
+    env_file:
+      # - ./backend/.env.dev
+      - ./backend/.env
     volumes:
       - ./backend/app:/app
 
