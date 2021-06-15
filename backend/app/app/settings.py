@@ -12,9 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
-import pymysql
-pymysql.version_info = (1, 4, 2, 'final', 0)
-pymysql.install_as_MySQLdb()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = 'django-insecure-mp4m&^+r36$507ucoyibbown0(@%h@fxvjm%gtl@+4k6((w%cs'
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-mp4m&^+r36$507ucoyibbown0(@%h@fxvjm%gtl@+4k6((w%cs')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = False
@@ -43,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'crt_page'
 ]
 
 MIDDLEWARE = [
