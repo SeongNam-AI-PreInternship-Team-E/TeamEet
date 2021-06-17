@@ -3,3 +3,5 @@ __pycache__
 venv
 db.sqlite3
 *.pem
+migrations/
+__pycache__
