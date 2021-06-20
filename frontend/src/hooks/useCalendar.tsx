@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { AiFillCaretLeft, AiFillCaretRight } from 'react-icons/ai';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
-import MyNewCal from './MyNewCal';
+import CalendarPresent from './CalendarPresent';
 import 'dayjs/plugin/timezone';
 import 'dayjs/locale/ko';
 import 'dayjs/plugin/utc';
@@ -148,11 +148,11 @@ export const Calendar = (props: Props) => {
             <div key={week}>{week}</div>
           ))}
           {days.map((day) => (
-            <MyNewCal
+            <CalendarPresent
               key={day.key}
               onChangeColorStyle={onChangeColorStyle}
               day={day}
-            ></MyNewCal>
+            ></CalendarPresent>
           ))}
         </Cal>
       </CalendarContainer>
