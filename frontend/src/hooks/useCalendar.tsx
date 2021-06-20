@@ -2,10 +2,11 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { AiFillCaretLeft, AiFillCaretRight } from 'react-icons/ai';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
+import CalendarPresent from './CalendarPresent';
 import 'dayjs/plugin/timezone';
 import 'dayjs/locale/ko';
 import 'dayjs/plugin/utc';
-import { daysSlice } from './../modules/calendar';
+import { start } from 'repl';
 interface Props {}
 
 export function useCalendar() {
@@ -13,21 +14,60 @@ export function useCalendar() {
   const utc = require('dayjs/plugin/utc');
   dayjs.extend(utc);
   dayjs.extend(timezone);
-  const [month, onChangeMonth] = useState(dayjs().tz('Asia/Seoul').month() + 1);
-  const year = dayjs().tz('Asia/Seoul').year();
-  console.log(year);
+  const [month, onChangeMonth] = useState(
+    dayjs().tz('Asia/Seoul').locale('ko')
+  );
+
   const onClickPlus = useCallback(() => {
-    onChangeMonth(month + 1);
+    onChangeMonth(month.add(1, 'M'));
   }, [month]);
   const onClickMinus = useCallback(() => {
-    onChangeMonth(month - 1);
+    onChangeMonth(month.subtract(1, 'M'));
   }, [month]);
-  return { onClickPlus, onClickMinus, month };
+  const weekOfDay = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+  return { onClickPlus, onClickMinus, month, weekOfDay };
 }
 
-const CalendarElement = styled.div`
-  width: 100vw;
-  height: 80vh;
+function getDays(month: any) {
+  let days = [];
+  let i = 1;
+  let k = 0;
+  const LastMonth = month.subtract(1, 'M');
+  const LastMonthEndDay = LastMonth.endOf('M');
+
+  const presentMonthStartDay = month.startOf('M').day();
+  const preDate = month.endOf('M').date();
+
+  let subDate = LastMonthEndDay.date();
+  console.log(subDate);
+  for (i = subDate - presentMonthStartDay + 1; i <= subDate; i++) {
+    days.push({ day: i, present: false, key: k, color: 'white' });
+    k++;
+  }
+  for (i = 1; i <= preDate; i++) {
+    days.push({ day: i, present: true, key: k, color: 'white' });
+    k++;
+  }
+  i = 1;
+  while (days.length !== 42) {
+    days.push({ day: i, present: false, key: k, color: 'white' });
+    i++;
+    k++;
+  }
+
+  return days;
+}
+
+export interface day {
+  day: number;
+  present: boolean;
+  key: number;
+  color: string;
+}
+const CalendarWrapper = styled.div`
+  width: 100%;
+  height: 100%;
   border: 1px solid black;
 `;
 
@@ -39,74 +79,83 @@ const CalendarContainer = styled.div`
 `;
 
 const Header = styled.div`
-  flex-basis: 50px;
-  background-color: rgb(224, 215, 202);
   display: flex;
+  flex-direction: column;
+  padding-left: 1.2rem;
+
   h2 {
-    box-sizing: border-box;
-    padding-left: 5px;
-    flex-grow: 1;
-    line-height: 50px;
+    font-weight: 800;
+    font-size: 1.5rem;
   }
   h3 {
+    display: flex;
     flex-direction: row;
-    box-sizing: border-box;
-    padding-left: 5px;
-    flex-grow: 4;
-    line-height: 50px;
-  }
-  ul {
-    line-height: 50px;
-    flex-basis: 120px;
-    padding-left: 0;
-    padding-top: 4px;
-    display: block;
-    list-style-type: none;
-    margin: 0;
-    li {
-      line-height: 50px;
-      float: left;
-      height: 40px;
-      line-height: 40px;
-      font-size: 20px;
-    }
+    font-weight: 600;
+    font-size: 1.2rem;
   }
 `;
 
 const Cal = styled.div`
   flex-grow: 1;
-  background-color: rgb(127, 184, 127);
-  display: flex;
+
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  width: auto;
+  height: auto;
+  text-align: center;
+  align-items: center;
+  align-content: center;
 `;
 
 export const Calendar = (props: Props) => {
-  const { onClickPlus, onClickMinus, month } = useCalendar();
+  const { onClickPlus, onClickMinus, month, weekOfDay } = useCalendar();
+
+  const [days, onChangeDay] = useState(getDays(month));
+  console.log(days);
+  const onChangeColorStyle = (id: number) => {
+    onChangeDay(
+      days.map((day) => (day.key === id ? { ...day, color: '#5465FF' } : day))
+    );
+  };
   return (
-    <CalendarElement>
+    <CalendarWrapper>
       <CalendarContainer>
         <Header>
-          <h2>{dayjs().format('YYYY년 MM월')}</h2>
-          <h3>{dayjs().format('현재 YYYY - MM - DD')}</h3>
-          <h3>{month}</h3>
-          <ul>
-            <li>
-              <AiFillCaretLeft
-                onClick={onClickMinus}
-                style={{ cursor: 'pointer' }}
-              ></AiFillCaretLeft>
-            </li>
-            <li>이동</li>
-            <li>
-              <AiFillCaretRight
-                onClick={onClickPlus}
-                style={{ cursor: 'pointer' }}
-              ></AiFillCaretRight>
-            </li>
-          </ul>
+          <h2>{month.format('YYYY')}</h2>
+          <h3>
+            <AiFillCaretLeft
+              onClick={() => {
+                onClickMinus();
+                onChangeDay(getDays(month.subtract(1, 'M')));
+              }}
+              style={{ cursor: 'pointer' }}
+            ></AiFillCaretLeft>
+            {month.locale('en').format('MMM')}
+            &nbsp;
+            {month.format('MM')}
+            <AiFillCaretRight
+              onClick={() => {
+                onClickPlus();
+                onChangeDay(getDays(month.add(1, 'M')));
+              }}
+              style={{ cursor: 'pointer' }}
+            ></AiFillCaretRight>
+          </h3>
         </Header>
-
-        <Cal />
+        <Cal>
+          {weekOfDay.map((week) => (
+            <div key={week}>{week}</div>
+          ))}
+          {days.map((day) => (
+            <CalendarPresent
+              key={day.key}
+              onChangeColorStyle={onChangeColorStyle}
+              day={day}
+            ></CalendarPresent>
+          ))}
+        </Cal>
       </CalendarContainer>
-    </CalendarElement>
+    </CalendarWrapper>
   );
 };
