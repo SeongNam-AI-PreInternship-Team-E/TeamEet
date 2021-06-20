@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { AiFillCaretLeft, AiFillCaretRight } from 'react-icons/ai';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
+import MyNewCal from './MyNewCal';
 import 'dayjs/plugin/timezone';
 import 'dayjs/locale/ko';
 import 'dayjs/plugin/utc';
@@ -23,32 +24,51 @@ export function useCalendar() {
   const onClickMinus = useCallback(() => {
     onChangeMonth(month.subtract(1, 'M'));
   }, [month]);
-  const weekOfDay = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+  const weekOfDay = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
   return { onClickPlus, onClickMinus, month, weekOfDay };
 }
 
 function getDays(month: any) {
-  let days: number[] = [];
+  let days = [];
+  let i = 1;
+  let k = 0;
   const LastMonth = month.subtract(1, 'M');
-  const LastMonthEndDay = LastMonth.format('M');
-  const LastMonthStartDay = LastMonth.startOf('M').month();
+  const LastMonthEndDay = LastMonth.endOf('M');
 
-  const nextMonth = month.add(1, 'M');
-  const nextMonthEndDay = nextMonth.format('M');
-  const nextMonthStartDay = nextMonth.startOf('M').month();
+  const presentMonthStartDay = month.startOf('M').day();
+  const preDate = month.endOf('M').date();
 
-  console.log('시작 요일', LastMonthStartDay);
-  console.log('끝 요일', LastMonthEndDay);
-  console.log('시작 요일', nextMonthStartDay);
-  console.log('끝 요일', nextMonthStartDay);
+  let subDate = LastMonthEndDay.date();
+  console.log(subDate);
+  for (i = subDate - presentMonthStartDay + 1; i <= subDate; i++) {
+    days.push({ day: i, present: false, key: k, color: 'white' });
+    k++;
+  }
+  for (i = 1; i <= preDate; i++) {
+    days.push({ day: i, present: true, key: k, color: 'white' });
+    k++;
+  }
+  i = 1;
+  while (days.length !== 42) {
+    days.push({ day: i, present: false, key: k, color: 'white' });
+    i++;
+    k++;
+  }
+
+  return days;
 }
 
+export interface day {
+  day: number;
+  present: boolean;
+  key: number;
+  color: string;
+}
 const CalendarWrapper = styled.div`
-  width: 50%;
-  height: 30rem;
+  width: 100%;
+  height: 100%;
   border: 1px solid black;
-  margin-left: 2rem;
 `;
 
 const CalendarContainer = styled.div`
@@ -56,7 +76,6 @@ const CalendarContainer = styled.div`
   flex-direction: column;
   width: 100%;
   height: 100%;
-  box-sizing: border-box;
 `;
 
 const Header = styled.div`
@@ -78,31 +97,48 @@ const Header = styled.div`
 
 const Cal = styled.div`
   flex-grow: 1;
-  background-color: #5465ff;
+
   display: grid;
-  grid-template-columns: repeat(7, minmax(2rem, auto));
-  grid-template-rows: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  width: auto;
+  height: auto;
   text-align: center;
   align-items: center;
+  align-content: center;
 `;
 
 export const Calendar = (props: Props) => {
   const { onClickPlus, onClickMinus, month, weekOfDay } = useCalendar();
-  getDays(month);
+
+  const [days, onChangeDay] = useState(getDays(month));
+  console.log(days);
+  const onChangeColorStyle = (id: number) => {
+    onChangeDay(
+      days.map((day) => (day.key === id ? { ...day, color: '#5465FF' } : day))
+    );
+  };
   return (
     <CalendarWrapper>
       <CalendarContainer>
         <Header>
           <h2>{month.format('YYYY')}</h2>
           <h3>
-            {month.locale('en').format('MMM')}
             <AiFillCaretLeft
-              onClick={onClickMinus}
-              style={{ marginLeft: 'auto', cursor: 'pointer' }}
+              onClick={() => {
+                onClickMinus();
+                onChangeDay(getDays(month.subtract(1, 'M')));
+              }}
+              style={{ cursor: 'pointer' }}
             ></AiFillCaretLeft>
+            {month.locale('en').format('MMM')}
+            &nbsp;
             {month.format('MM')}
             <AiFillCaretRight
-              onClick={onClickPlus}
+              onClick={() => {
+                onClickPlus();
+                onChangeDay(getDays(month.add(1, 'M')));
+              }}
               style={{ cursor: 'pointer' }}
             ></AiFillCaretRight>
           </h3>
@@ -110,6 +146,13 @@ export const Calendar = (props: Props) => {
         <Cal>
           {weekOfDay.map((week) => (
             <div key={week}>{week}</div>
+          ))}
+          {days.map((day) => (
+            <MyNewCal
+              key={day.key}
+              onChangeColorStyle={onChangeColorStyle}
+              day={day}
+            ></MyNewCal>
           ))}
         </Cal>
       </CalendarContainer>
