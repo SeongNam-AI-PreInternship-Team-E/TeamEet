@@ -1,9 +1,23 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import dayjs from 'dayjs';
+import 'dayjs/plugin/timezone';
+import 'dayjs/locale/ko';
+import 'dayjs/plugin/utc';
+import { stat } from 'fs';
+import internal from 'stream';
 
 export type Days = {
-  id: number;
-  day: string;
-  check: boolean;
+  day: number;
+  present: boolean;
+  key: number;
+  color: string;
+};
+type initial = {
+  weekOfDay: any[];
+  Days: Days[];
+  month: any;
+  start_hour: number;
+  end_hour: number;
 };
 export type Times = {
   start_hour: string;
@@ -13,50 +27,91 @@ export type Times = {
 export type DaysState = Days[];
 export type TimesState = Times[];
 
+const timezone = require('dayjs/plugin/timezone');
+const utc = require('dayjs/plugin/utc');
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 let nextId = 1;
-const initialState = {
-  Days: [
-    { id: 1, day: '월요일', check: false },
-    { id: 2, day: '화요일', check: false },
-    { id: 3, day: '수요일', check: false },
-    { id: 4, day: '목요일', check: false },
-    { id: 5, day: '금요일', check: false },
-    { id: 6, day: '토요일', check: false },
-    { id: 7, day: '일요일', check: false },
-  ],
-  Availiable: [0],
-  start_hour: 6,
-  end_hour: 24,
+const initialState: initial = {
+  weekOfDay: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+  Days: [],
+  month: dayjs().tz('Asia/Seoul').locale('ko'),
+
+  start_hour: 0,
+  end_hour: 0,
 };
 
 export const daysSlice = createSlice({
   name: 'DAYS',
   initialState,
   reducers: {
-    addTodo: (state, action: PayloadAction<number>) => {
-      state.Availiable.push(action.payload);
-      console.log(state);
+    addDays: (state) => {
+      state.Days.push();
+      let i = 1;
+      let k = 0;
+      const LastMonth = state.month.subtract(1, 'M');
+      const LastMonthEndDay = LastMonth.endOf('M');
+
+      const presentMonthStartDay = state.month.startOf('M').day();
+      const preDate = state.month.endOf('M').date();
+
+      let subDate = LastMonthEndDay.date();
+      console.log(subDate);
+      for (i = subDate - presentMonthStartDay + 1; i <= subDate; i++) {
+        state.Days.push({ day: i, present: false, key: k, color: 'white' });
+        k++;
+      }
+      for (i = 1; i <= preDate; i++) {
+        state.Days.push({ day: i, present: true, key: k, color: 'white' });
+        k++;
+      }
+      i = 1;
+      while (state.Days.length !== 42) {
+        state.Days.push({ day: i, present: false, key: k, color: 'white' });
+        i++;
+        k++;
+      }
     },
-    setStartHour: (state, action: PayloadAction<number>) => {
+    nextMonth: (state) => {
+      state.Days = [];
+      state.month = state.month.add(1, 'M');
+      addDays();
+    },
+    prevMonth: (state) => {
+      state.Days = [];
+      state.month = state.month.subtract(1, 'M');
+      addDays();
+    },
+    newMonth: (state, action: PayloadAction<any>) => {
+      state.Days = [];
+      state.month = state.month.add(1, 'M');
+      addDays();
+    },
+    changeStarDay: (state, action: PayloadAction<number>) => {
       state.start_hour = action.payload;
     },
-    setEndHour: (state, action: PayloadAction<number>) => {
+    changeEndDay: (state, action: PayloadAction<number>) => {
       state.end_hour = action.payload;
     },
-    // removeTodo: (state, action: PayloadAction<number>) => {
-    //   const todo = state.findIndex((todo) => todo.id === action.payload);
-    //   state.splice(todo, 1);
-    // },
-    toggleDays: (state, action: PayloadAction<number>) => {
-      const days = state.Days.find((day) => day.id === action.payload);
-      if (days) {
-        days.check = !days.check;
+    dragMonth: (state) => {
+      for (let i = state.start_hour; i <= state.end_hour; i++) {
+        const day = state.Days.find((day) => day.key === i);
+        if (day) {
+          day.color = '#5465FF';
+        }
       }
     },
   },
 });
 
-export const { toggleDays, addTodo, setStartHour, setEndHour } =
-  daysSlice.actions;
+export const {
+  addDays,
+  prevMonth,
+  nextMonth,
+  changeEndDay,
+  changeStarDay,
+  dragMonth,
+} = daysSlice.actions;
 
 export default daysSlice.reducer;
