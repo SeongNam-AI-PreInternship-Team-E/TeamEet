@@ -1,11 +1,15 @@
 import React from 'react';
-import type { day } from './useCalendar';
+import type { Days } from '../../modules/calendar';
 import styled, { css } from 'styled-components';
+import { dragMonth } from '../../modules/calendar';
 interface Props {
-  day: day;
+  day: Days;
   onSetEnd: (id: number) => void;
   onSetStart: (id: number) => void;
-  onClickDrag: () => void;
+  onClickDrag: (id: number) => void;
+  isDown: any;
+  onChangeDown: any;
+  onClickMonth: (id: number) => void;
 }
 
 const DayBox = styled.div`
@@ -17,22 +21,46 @@ const DayBox = styled.div`
   line-height: 2rem;
 `;
 
-function CalendarPresent({ day, onClickDrag, onSetEnd, onSetStart }: Props) {
+function CalendarPresent({
+  day,
+  onClickDrag,
+  onSetEnd,
+  onSetStart,
+  isDown,
+  onChangeDown,
+  onClickMonth,
+}: Props) {
   return (
     <DayBox
       onMouseDown={(e) => {
         e.preventDefault();
         onSetStart(day.key);
+        onChangeDown({ drag: true, key: day.key });
+        onClickMonth(day.key);
+      }}
+      onMouseMove={() => {
+        if (isDown.drag === true) {
+          onSetEnd(day.key);
+          if (isDown.key !== day.key) onClickDrag(day.key);
+          onChangeDown({ drag: true, key: day.key });
+          // dragMonth(day.key);
+        }
       }}
       onMouseUpCapture={() => {
         onSetEnd(day.key);
       }}
       onMouseUp={() => {
-        onClickDrag();
+        // onClickDrag();
+        onChangeDown(false);
       }}
       style={
         day.present
-          ? { opacity: 1, cursor: 'pointer', backgroundColor: `${day.color}` }
+          ? {
+              opacity: 1,
+              cursor: 'pointer',
+              backgroundColor: `${day.color}`,
+              color: `${day.text_color}`,
+            }
           : { opacity: 0.3, cursor: 'not-allowed' }
       }
     >
