@@ -3,14 +3,13 @@ import dayjs from 'dayjs';
 import 'dayjs/plugin/timezone';
 import 'dayjs/locale/ko';
 import 'dayjs/plugin/utc';
-import { stat } from 'fs';
-import internal from 'stream';
 
 export type Days = {
   day: number;
   present: boolean;
   key: number;
   color: string;
+  text_color: string;
 };
 type initial = {
   weekOfDay: any[];
@@ -32,7 +31,6 @@ const utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-let nextId = 1;
 const initialState: initial = {
   weekOfDay: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
   Days: [],
@@ -59,16 +57,34 @@ export const daysSlice = createSlice({
       let subDate = LastMonthEndDay.date();
       console.log(subDate);
       for (i = subDate - presentMonthStartDay + 1; i <= subDate; i++) {
-        state.Days.push({ day: i, present: false, key: k, color: 'white' });
+        state.Days.push({
+          day: i,
+          present: false,
+          key: k,
+          color: 'white',
+          text_color: 'black',
+        });
         k++;
       }
       for (i = 1; i <= preDate; i++) {
-        state.Days.push({ day: i, present: true, key: k, color: 'white' });
+        state.Days.push({
+          day: i,
+          present: true,
+          key: k,
+          color: 'white',
+          text_color: 'black',
+        });
         k++;
       }
       i = 1;
       while (state.Days.length !== 42) {
-        state.Days.push({ day: i, present: false, key: k, color: 'white' });
+        state.Days.push({
+          day: i,
+          present: false,
+          key: k,
+          color: 'white',
+          text_color: 'black',
+        });
         i++;
         k++;
       }
@@ -94,11 +110,33 @@ export const daysSlice = createSlice({
     changeEndDay: (state, action: PayloadAction<number>) => {
       state.end_hour = action.payload;
     },
-    dragMonth: (state) => {
-      for (let i = state.start_hour; i <= state.end_hour; i++) {
-        const day = state.Days.find((day) => day.key === i);
-        if (day) {
+    dragMonth: (state, action: PayloadAction<number>) => {
+      // for (let i = state.start_hour; i <= state.end_hour; i++) {
+      //   const day = state.Days.find((day) => day.key === i);
+      //   if (day) {
+      //     day.color = '#5465FF';
+      //   }
+      // }
+      const day = state.Days.find((day) => day.key === action.payload);
+      if (day) {
+        if (day.color === '#5465FF') {
+          day.color = 'white';
+          day.text_color = 'black';
+        } else {
           day.color = '#5465FF';
+          day.text_color = 'white';
+        }
+      }
+    },
+    clickMonth: (state, action: PayloadAction<number>) => {
+      const day = state.Days.find((day) => day.key === action.payload);
+      if (day) {
+        if (day.color === '#5465FF') {
+          day.color = 'white';
+          day.text_color = 'black';
+        } else {
+          day.color = '#5465FF';
+          day.text_color = 'white';
         }
       }
     },
@@ -112,6 +150,7 @@ export const {
   changeEndDay,
   changeStarDay,
   dragMonth,
+  clickMonth,
 } = daysSlice.actions;
 
 export default daysSlice.reducer;

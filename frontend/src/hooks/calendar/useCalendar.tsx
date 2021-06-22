@@ -9,6 +9,7 @@ import {
   changeEndDay,
   changeStarDay,
   dragMonth,
+  clickMonth,
 } from '../../modules/calendar';
 import { RootState } from '../../modules';
 
@@ -22,6 +23,10 @@ export function useCalendar() {
     weekOfDay: state.calendar.weekOfDay,
     month: state.calendar.month,
   }));
+  const [isDown, onChangeDown] = useState({
+    drag: false,
+    key: 99999,
+  });
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(addDays());
@@ -40,8 +45,11 @@ export function useCalendar() {
   const onSetEnd = (id: number) => {
     dispatch(changeEndDay(id));
   };
-  const onClickDrag = () => {
-    dispatch(dragMonth());
+  const onClickDrag = (id: number) => {
+    dispatch(dragMonth(id));
+  };
+  const onClickMonth = (id: number) => {
+    dispatch(clickMonth(id));
   };
   return {
     onClickPrev,
@@ -52,6 +60,9 @@ export function useCalendar() {
     onSetEnd,
     onSetStart,
     onClickDrag,
+    isDown,
+    onChangeDown,
+    onClickMonth,
   };
 }
 
@@ -112,6 +123,9 @@ export const Calendar = (props: Props) => {
     onSetEnd,
     onSetStart,
     onClickDrag,
+    onClickMonth,
+    isDown,
+    onChangeDown,
   } = useCalendar();
 
   return (
@@ -148,6 +162,9 @@ export const Calendar = (props: Props) => {
               onClickDrag={onClickDrag}
               key={day.key}
               day={day}
+              isDown={isDown}
+              onChangeDown={onChangeDown}
+              onClickMonth={onClickMonth}
             ></CalendarPresent>
           ))}
         </Cal>
