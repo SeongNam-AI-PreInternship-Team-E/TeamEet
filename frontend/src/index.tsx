@@ -16,6 +16,15 @@ const store = createStore(
   composeWithDevTools(applyMiddleware(sagaMiddleware))
 ); // 스토어를 만듭니다.
 
+function loadUser() {
+  try {
+    const user = localStorage.getItem('user');
+    if (!user) return;
+  } catch (e) {
+    console.log('local storage not working');
+  }
+}
+
 sagaMiddleware.run(rootSaga);
 ReactDOM.render(
   <Provider store={store}>

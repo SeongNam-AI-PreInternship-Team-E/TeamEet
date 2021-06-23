@@ -1,13 +1,14 @@
-import * as React from 'react';
-import SampleContainer from './components/SampleContainer';
-
-import { useCalendar } from './hooks/calendar/useCalendar';
-import { CalendarContainer } from './components/CalendarContainer';
+import { Route } from 'react-router-dom';
+import AuthPage from './pages/AuthPage';
+import { CalendarPage } from './pages/CalendarPage';
+import LoginPage from './pages/LoginPage';
 type Props = {};
 const App = (props: Props) => {
   return (
     <>
-      <CalendarContainer />
+      <Route component={CalendarPage} path="/" exact />
+      <Route component={AuthPage} path="/register" />
+      <Route component={LoginPage} path="/login" />
     </>
   );
 };
