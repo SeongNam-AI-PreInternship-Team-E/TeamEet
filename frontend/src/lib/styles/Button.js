@@ -43,13 +43,16 @@ const buttonStyle = css`
       min-width: 13rem;
       font-size: 1.125rem;
       color: rgba(84, 101, 255, 1);
-      margin-top: 4rem;
+      margin-top: 2rem;
       a {
         font-family: Noto Sans KR;
         font-style: normal;
         font-weight: normal;
         font-size: 18px;
         line-height: 26px;
+      }
+      & + & {
+        margin-top: 0.5rem;
       }
     `}
   ${(props) =>
