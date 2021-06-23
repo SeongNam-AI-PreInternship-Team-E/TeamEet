@@ -44,7 +44,7 @@ export function AuthTemplate({ children }: any) {
   return (
     <AuthTemplateBlock style={{ backgroundImage: `url(${Background})` }}>
       <BlackBox>
-        <div className="logo-area">Welcome to Pickday</div>
+        <div className="logo-area">Welcome to PickDay</div>
         {children}
       </BlackBox>
     </AuthTemplateBlock>
