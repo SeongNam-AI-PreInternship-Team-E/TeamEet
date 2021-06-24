@@ -1,8 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import dayjs from 'dayjs';
-import 'dayjs/plugin/timezone';
-import 'dayjs/locale/ko';
-import 'dayjs/plugin/utc';
 
 export type Days = {
   day: number;
@@ -10,6 +7,7 @@ export type Days = {
   key: number;
   color: string;
   text_color: string;
+  month: number;
 };
 type initial = {
   weekOfDay: any[];
@@ -17,6 +15,7 @@ type initial = {
   month: any;
   start_hour: number;
   end_hour: number;
+  title: string;
 };
 export type Times = {
   start_hour: string;
@@ -26,16 +25,13 @@ export type Times = {
 export type DaysState = Days[];
 export type TimesState = Times[];
 
-const timezone = require('dayjs/plugin/timezone');
-const utc = require('dayjs/plugin/utc');
-dayjs.extend(utc);
-dayjs.extend(timezone);
+
 
 const initialState: initial = {
   weekOfDay: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
   Days: [],
-  month: dayjs().tz('Asia/Seoul').locale('ko'),
-
+  month: dayjs(),
+  title: '',
   start_hour: 0,
   end_hour: 0,
 };
@@ -44,15 +40,25 @@ export const daysSlice = createSlice({
   name: 'DAYS',
   initialState,
   reducers: {
+    setDay: (state, action: PayloadAction<any>) => {
+      state.month = action.payload
+    },
+    setInitialDate: (state) => {
+      state.Days = []
+    },
     addDays: (state) => {
       state.Days.push();
       let i = 1;
       let k = 0;
       const LastMonth = state.month.subtract(1, 'M');
       const LastMonthEndDay = LastMonth.endOf('M');
+      const LastMonthNum = LastMonth.month();
 
       const presentMonthStartDay = state.month.startOf('M').day();
       const preDate = state.month.endOf('M').date();
+      const preMonth = state.month;
+    
+      const NextMonth = state.month.add(1, 'M').month();
 
       let subDate = LastMonthEndDay.date();
       console.log(subDate);
@@ -63,6 +69,7 @@ export const daysSlice = createSlice({
           key: k,
           color: 'white',
           text_color: 'black',
+          month: LastMonthNum
         });
         k++;
       }
@@ -73,6 +80,7 @@ export const daysSlice = createSlice({
           key: k,
           color: 'white',
           text_color: 'black',
+          month: preMonth,
         });
         k++;
       }
@@ -84,11 +92,13 @@ export const daysSlice = createSlice({
           key: k,
           color: 'white',
           text_color: 'black',
+          month: NextMonth,
         });
         i++;
         k++;
       }
     },
+    
     nextMonth: (state) => {
       state.Days = [];
       state.month = state.month.add(1, 'M');
@@ -140,6 +150,9 @@ export const daysSlice = createSlice({
         }
       }
     },
+    addTitle: (state, action: PayloadAction<string>) => {
+      state.title= action.payload;
+    }
   },
 });
 
@@ -151,6 +164,9 @@ export const {
   changeStarDay,
   dragMonth,
   clickMonth,
+  addTitle,
+  setDay,
+  setInitialDate,
 } = daysSlice.actions;
 
 export default daysSlice.reducer;
