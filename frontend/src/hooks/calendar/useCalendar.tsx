@@ -11,8 +11,6 @@ import {
   addDays,
   nextMonth,
   prevMonth,
-  changeEndDay,
-  changeStarDay,
   dragMonth,
   clickMonth,
   setDay,
@@ -23,6 +21,8 @@ import { RootState } from '../../modules';
 
 import CalendarPresent from './CalendarPresent';
 import Modal, { useModal } from '../common/useModal';
+import { red } from '@material-ui/core/colors';
+import { executeReducerBuilderCallback } from '@reduxjs/toolkit/dist/mapBuilders';
 
 interface Props {}
 
@@ -37,6 +37,7 @@ export function useCalendar() {
     drag: false,
     key: 99999,
   });
+
   const timezone = require('dayjs/plugin/timezone');
   const utc = require('dayjs/plugin/utc');
   dayjs.extend(utc);
@@ -57,12 +58,6 @@ export function useCalendar() {
     dispatch(nextMonth());
     dispatch(addDays());
   };
-  const onSetStart = (id: number) => {
-    dispatch(changeStarDay(id));
-  };
-  const onSetEnd = (id: number) => {
-    dispatch(changeEndDay(id));
-  };
   const onClickDrag = (id: number) => {
     dispatch(dragMonth(id));
   };
@@ -78,13 +73,12 @@ export function useCalendar() {
     weekOfDay,
     Days,
     month,
-    onSetEnd,
-    onSetStart,
     onClickDrag,
     isDown,
     onChangeDown,
     onClickMonth,
     onChangeTitle,
+
     title,
   };
 }
@@ -106,6 +100,7 @@ const TitleContainer = styled.div`
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  margin-top: 5rem;
   h4 {
     width: 10%;
   }
@@ -169,15 +164,17 @@ const Header = styled.div`
   width: 100%;
   justify-content: center;
   align-items: center;
+
   h3 {
     z-index: 999;
     box-sizing: border-box;
 
     font-weight: 600;
-    font-size: 1.2rem;
+    font-size: 1.6rem;
     width: 60%;
     display: flex;
     justify-content: center;
+    align-items: center;
   }
   h2 {
     z-index: 1;
@@ -185,6 +182,7 @@ const Header = styled.div`
     width: 10%;
     font-weight: 800;
     font-size: 1.5rem;
+    align-content: center;
     justify-content: center;
     padding-left: 1rem;
   }
@@ -203,6 +201,11 @@ const Cal = styled.div`
   text-align: center;
 `;
 
+const DayOfWeek = styled.div`
+  font-size: 1.2rem;
+  font-weight: bolder;
+`;
+
 export const Calendar = (props: Props) => {
   const {
     onClickNext,
@@ -210,8 +213,6 @@ export const Calendar = (props: Props) => {
     weekOfDay,
     month,
     Days,
-    onSetEnd,
-    onSetStart,
     onClickDrag,
     onClickMonth,
     isDown,
@@ -263,13 +264,22 @@ export const Calendar = (props: Props) => {
           <h2>{month.format('YYYY')}</h2>
         </Header>
         <Cal>
-          {weekOfDay.map((week) => (
-            <div key={week}>{week}</div>
+          {weekOfDay.map((week): any => (
+            <DayOfWeek
+              style={
+                week === 'Sa'
+                  ? { color: 'blue' }
+                  : week === 'Su'
+                  ? { color: 'red' }
+                  : { color: 'black' }
+              }
+              key={week}
+            >
+              {week}
+            </DayOfWeek>
           ))}
           {Days.map((day: any) => (
             <CalendarPresent
-              onSetEnd={onSetEnd}
-              onSetStart={onSetStart}
               onClickDrag={onClickDrag}
               key={day.key}
               day={day}
