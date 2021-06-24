@@ -16,6 +16,7 @@ const DayBox = styled.div`
   cursor: pointer;
   box-sizing: border-box;
   width: 100%;
+
   height: 100%;
   margin: 0.2rem;
   line-height: 2rem;
@@ -40,7 +41,7 @@ function CalendarPresent({
       }}
       onMouseMove={() => {
         if (isDown.drag === true) {
-          onSetEnd(day.key);
+          // onSetEnd(day.key);
           if (isDown.key !== day.key) onClickDrag(day.key);
           onChangeDown({ drag: true, key: day.key });
           // dragMonth(day.key);
