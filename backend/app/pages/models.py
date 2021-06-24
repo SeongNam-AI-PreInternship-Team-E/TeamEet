@@ -35,7 +35,7 @@ class calendar_dates(models.Model):
 class group_members(models.Model):
     name = models.CharField(max_length=20)
     password = models.CharField(max_length=20)
-    #private_page = models.ForeignKey(private_pages, on_delete=models.CASCADE)
+    private_page = models.ForeignKey(private_pages, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'group_members'

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import private_pages, calendar_dates
+from .models import private_pages, calendar_dates, group_members
 
 # data를 JSON 형태로 바꿔줌
 # serializers.Serializer vs serializers.ModelSerializer
@@ -27,3 +27,10 @@ class GetDatesSerializer(serializers.ModelSerializer):
         model = calendar_dates
         fields = ['id', 'year', 'month', 'day',
                   'day_of_week', 'private_page_id']
+
+
+# 전체 회원 조회
+class GetMembersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = group_members
+        fields = ['id', 'name', 'password', 'private_page_id']
