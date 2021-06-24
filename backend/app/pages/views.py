@@ -44,7 +44,7 @@ def pages_list(request):
 
 
 # 고유한 페이지 조회
-@csrf_exempt
+# @csrf_exempt
 def pages(request, url):
     try:
         page = private_pages.objects.get(url=url)
@@ -57,7 +57,7 @@ def pages(request, url):
 
 
 # 고유한 페이지 유저 조회 및 생성
-@csrf_exempt
+# @csrf_exempt
 def pages_users(request, url):
     try:
         # 고유 url에 대한 private_pages 튜플 정보 가져옴
@@ -119,3 +119,10 @@ def dates(request):
             year=data['year'], month=data['month'], day=data['day'], day_of_week=data['day_of_week'])
 
         return HttpResponse(status=200)
+
+
+def members(request):
+    if request.method == "GET":
+        query_set = group_members.objects.all()
+        serializer = GetMembersSerializer(query_set, many=True)
+        return JsonResponse(serializer.data, safe=False)
