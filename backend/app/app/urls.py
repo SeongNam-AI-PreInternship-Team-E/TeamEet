@@ -21,7 +21,11 @@ from rest_framework.urlpatterns import format_suffix_patterns
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('pages/', views.pages_list),
-    path('dates/', views.dates)
+    path('pages/<str:url>/', views.pages),
+    path('pages/<str:url>/users/', views.pages_users),
+    path('dates/', views.dates),
+    path('members/', views.members),
+
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
