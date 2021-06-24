@@ -9,10 +9,6 @@ const buttonStyle = css`
   font-size: 1rem;
   font-weight: bold;
   padding: 0.25rem 1rem;
-  /* align-items: center;
-  align-content: center;
-  justify-content: center;
-  justify-self: center; */
   color: white;
   outline: none;
   cursor: pointer;
@@ -58,9 +54,9 @@ const buttonStyle = css`
   ${(props) =>
     props.cyan &&
     css`
-      background: ${palette.cyan[5]};
+      background: #5465ff;
       &:hover {
-        background: ${palette.cyan[4]};
+        background: rgba(84, 101, 255, 0.7);
       }
       @media (max-width: 768px) {
         width: 100%;

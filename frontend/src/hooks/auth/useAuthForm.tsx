@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Button from '../../lib/styles/Button';
 import { changeField, initialForm, register, login } from '../../modules/auth';
+import { setInitialDate } from '../../modules/calendar';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../modules';
 import type { IdPw } from '../../modules/auth';
@@ -20,6 +21,7 @@ export function useAuthForm() {
   const [check, onChangeCheck] = useState(false);
   useEffect(() => {
     dispatch(initialForm());
+    dispatch(setInitialDate());
   }, [dispatch]);
   const onSubmit = (e: any) => {
     e.preventDefault();
@@ -51,7 +53,7 @@ const StyledInput = styled.input`
   outline: none;
   min-width: 15rem;
   height: 3rem;
-
+  padding-left: 0.5rem;
   background-color: transparent;
   color: white;
   ::placeholder {
@@ -62,6 +64,7 @@ const StyledInput = styled.input`
     ::placeholder {
       display: none;
     }
+    padding-left: 0.5rem;
     color: white;
     border: 4px solid #ffffff;
   }
