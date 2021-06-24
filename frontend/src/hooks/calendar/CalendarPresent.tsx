@@ -4,8 +4,6 @@ import styled, { css } from 'styled-components';
 import { dragMonth } from '../../modules/calendar';
 interface Props {
   day: Days;
-  onSetEnd: (id: number) => void;
-  onSetStart: (id: number) => void;
   onClickDrag: (id: number) => void;
   isDown: any;
   onChangeDown: any;
@@ -19,14 +17,13 @@ const DayBox = styled.div`
 
   height: 100%;
   margin: 0.2rem;
-  line-height: 2rem;
+  min-height: 3.5rem;
+  line-height: 3.5rem;
 `;
 
 function CalendarPresent({
   day,
   onClickDrag,
-  onSetEnd,
-  onSetStart,
   isDown,
   onChangeDown,
   onClickMonth,
@@ -35,23 +32,16 @@ function CalendarPresent({
     <DayBox
       onMouseDown={(e) => {
         e.preventDefault();
-        onSetStart(day.key);
         onChangeDown({ drag: true, key: day.key });
         onClickMonth(day.key);
       }}
       onMouseMove={() => {
         if (isDown.drag === true) {
-          // onSetEnd(day.key);
           if (isDown.key !== day.key) onClickDrag(day.key);
           onChangeDown({ drag: true, key: day.key });
-          // dragMonth(day.key);
         }
       }}
-      onMouseUpCapture={() => {
-        onSetEnd(day.key);
-      }}
       onMouseUp={() => {
-        // onClickDrag();
         onChangeDown(false);
       }}
       style={

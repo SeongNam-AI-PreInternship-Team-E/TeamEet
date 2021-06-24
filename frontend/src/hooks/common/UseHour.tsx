@@ -47,7 +47,7 @@ const TimeBlock = styled.div`
   }
 `;
 const TimeSelect = styled.div`
-  width: 40%;
+  width: 35%;
 `;
 
 const UseHour = ({ onSetStart, onSetEnd }: Props) => {
@@ -61,7 +61,7 @@ const UseHour = ({ onSetStart, onSetEnd }: Props) => {
   };
   return (
     <TimeBlock>
-      <span>모임시간&nbsp;</span>
+      <span>모임시간&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
       <TimeSelect>
         <Select
           styles={{

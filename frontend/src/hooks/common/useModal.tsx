@@ -44,6 +44,7 @@ export function useModal() {
     end,
     onSetStart,
     onSetEnd,
+    title,
   };
 }
 
@@ -68,11 +69,21 @@ const AskModalBlock = styled.div`
   box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.125);
   display: block;
   h2 {
-    margin-top: 0.5rem;
+    display: inline-block;
+    margin-top: 2rem;
     margin-bottom: 1rem;
+    font-size: 1rem;
+    width: 50%;
+  }
+  h3 {
+    display: inline-block;
+    width: 45%;
+    font-size: 1rem;
+    text-align: right;
+    margin-right: 0.5rem;
   }
   p {
-    margin-bottom: 3rem;
+    margin-bottom: 0.5rem;
   }
   .buttons {
     display: flex;
@@ -81,24 +92,34 @@ const AskModalBlock = styled.div`
 `;
 const StyledButton = styled(Button)`
   height: 2rem;
+  margin-right: 0.5rem;
   & + & {
     margin-left: 0.75rem;
   }
 `;
 
 export default function Modal({ visible, onCancel, onConfirm }: any) {
-  const { modal, onNextClick, start, end, onSetStart, onSetEnd } = useModal();
+  const {
+    modal,
+    onNextClick,
+    start,
+    end,
+    onSetStart,
+    onSetEnd,
+    title,
+  } = useModal();
   if (!visible) return null;
   return (
     <FullScreen>
       <AskModalBlock>
         {console.log(start, end)}
         <UseHour onSetStart={onSetStart} onSetEnd={onSetEnd}></UseHour>
-        <h2>모임 설명</h2>
+        <h2>모임 제목 : </h2>
+        <h3>{title}</h3>
         <p></p>
         <div className="buttons">
           <StyledButton onClick={onCancel}>취소</StyledButton>
-          <StyledButton onClick={onConfirm} to="/register">
+          <StyledButton cyan onClick={onConfirm} to="/register">
             확인
           </StyledButton>
         </div>
