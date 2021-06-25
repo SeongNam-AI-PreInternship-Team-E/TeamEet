@@ -6,13 +6,21 @@ from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import status
 from rest_framework.response import Response
+from django.views import View
+
 # 랜덤 문자열 생성
 import string
 import random
 
+import json
+import jwt  # 토큰 발행에 사용
+from app.settings import SECRET_KEY, ALGORITHM  # 토큰 발행에 사용할 secret key, algorithm
+from .utils import login_decorator
 
 # 페이지 조회 및 생성
-@csrf_exempt
+
+
+# @csrf_exempt
 def pages_list(request):
     if request.method == "GET":
         query_set = private_pages.objects.all()
@@ -96,7 +104,7 @@ def pages_users(request, url):
         return HttpResponse('Successfully signed up')
 
 
-@csrf_exempt
+# @csrf_exempt
 def dates(request):
     if request.method == "GET":
         query_set = calendar_dates.objects.all()
@@ -121,8 +129,57 @@ def dates(request):
         return HttpResponse(status=200)
 
 
+# @login_decorator
 def members(request):
     if request.method == "GET":
         query_set = group_members.objects.all()
         serializer = GetMembersSerializer(query_set, many=True)
         return JsonResponse(serializer.data, safe=False)
+
+
+# @login_decorator
+class SignInView(View):
+    def post(self, request, url):
+        try:
+            # 고유 url에 대한 private_pages 튜플 정보 가져옴
+            page = private_pages.objects.get(url=url)
+        except private_pages.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        data = json.loads(request.body)
+        page_serializer = GetPagesSerializer(page)
+
+        # 파라미터 url을 통해 직렬화된 private_pages 인스턴스 id 값 추출
+        private_page_id = page_serializer.data['id']
+        try:
+            if group_members.objects.filter(name=data['name'], private_page_id=private_page_id).exists():
+                user = group_members.objects.get(
+                    name=data['name'], private_page_id=private_page_id)
+                print('비밀번호 확인 앞')
+                #---------비밀번호 확인--------#
+                if data['password'] == user.password:
+                    print('비밀번호 확인 뒤')
+                    #----------토큰 발행----------#
+
+                    token = jwt.encode(
+                        {'name': data['name'], 'private_page_id': private_page_id}, SECRET_KEY, ALGORITHM)
+
+                    #-----------------------------#
+
+                    # 토큰을 담아서 응답
+                    return JsonResponse({"token": token}, status=200)
+
+            else:
+                return HttpResponse(status=401)
+
+            return HttpResponse(status=400)
+
+        except KeyError:
+            return JsonResponse({"message": "INVALID_KEYS"}, status=400)
+
+
+class MemberView(View):
+    @login_decorator
+    def get(self, request):
+        print("get-test")
+        return JsonResponse({'group_member': list(group_members.objects.values())}, status=200)
