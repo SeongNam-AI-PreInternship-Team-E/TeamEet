@@ -1,5 +1,24 @@
 # TeamEet
 
+## 설명
+
+---
+
+팀원 간 일정 공유를 통해 미팅 시간을 조율해 주는 웹사이트입니다.  
+HTTP API 방식으로 JSON을 결과값으로 출력합니다.
+
+> 현재 개발 중에 있습니다.
+
+[Software Design DoC 및 개발 일지](https://www.notion.so/SW-Design-DOC-0d2c078c9efa4698bb48d5a31a3abc8b)  
+[API 문서화](https://documenter.getpostman.com/view/13993198/TzedgQAx)
+<br>
+
+## **아키텍처**
+
+![ex_screenshot](./img/architecture.png)
+
+<br>
+
 ## **Git Convention**
 
 ### **Process**
@@ -43,7 +62,7 @@
 3. 제목의 경우 타입, 역할은 **대괄호 안에 소문자로 작성**합니다.
 4. type 다음에는 **/ 로 분리**하여 **역할을 명시**한다.
 5. 제목 작성후 우측에 **#이슈번호**를 남겨서 어떤 이슈에 대한 작업인지 명시합니다.
-6. ex) #> git commit -m "[fix/front] XSS Vulnerability _ #20"
+6. ex) #> git commit -m "[fix/front] XSS Vulnerability \_ #20"
 
 ```xml
 [type/{front or back or AI or RPI}] Subject - #2 // -> 제목
@@ -58,15 +77,16 @@ body //  -> 본문
 ### **타입**
 
 - 어떤 의도인지 타입에 명세한다.
-    1. feat: 새로운 기능 추가
 
-    ```xml
-    ex)
-    [feat] 버튼 클릭 시 날짜 선택 하는 기능 추가
+  1. feat: 새로운 기능 추가
 
-    body: 버튼 클릭 시 picker를 통해 날짜를 선택하게 구현
-    picker뷰는 toolbar를 이용했음
-    ```
+  ```xml
+  ex)
+  [feat] 버튼 클릭 시 날짜 선택 하는 기능 추가
+
+  body: 버튼 클릭 시 picker를 통해 날짜를 선택하게 구현
+  picker뷰는 toolbar를 이용했음
+  ```
 
 2. fix: 버그 수정
 
