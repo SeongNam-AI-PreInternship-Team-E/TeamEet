@@ -108,7 +108,9 @@ export const daysSlice = createSlice({
       }
       for (i=0; i<state.pickArr.length; i++) {
         const check = state.Days.find((day)=> day.key === state.pickArr[i]);
-        if (check) check.color ='#5465FF';
+        if (check) {check.color ='#5465FF'
+      check.text_color = 'white'
+      };
       }
       state.pickArr=[]
       i = 1;
