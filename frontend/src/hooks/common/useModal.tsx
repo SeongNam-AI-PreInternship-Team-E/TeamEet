@@ -64,10 +64,34 @@ const FullScreen = styled.div`
 const AskModalBlock = styled.div`
   width: 400px;
   background: white;
+  animation: appear 0.8s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+  /* animation: dissappear 0.8s cubic-bezier(0.77, 0, 0.175, 1) forwards; */
+
   padding: 1.5rem;
   border-radius: 4px;
   box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.125);
   display: block;
+  @keyframes appear {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* @keyframes dissappear {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+  } */
   h2 {
     display: inline-block;
     margin-top: 2rem;
@@ -99,15 +123,8 @@ const StyledButton = styled(Button)`
 `;
 
 export default function Modal({ visible, onCancel, onConfirm }: any) {
-  const {
-    modal,
-    onNextClick,
-    start,
-    end,
-    onSetStart,
-    onSetEnd,
-    title,
-  } = useModal();
+  const { modal, onNextClick, start, end, onSetStart, onSetEnd, title } =
+    useModal();
   if (!visible) return null;
   return (
     <FullScreen>

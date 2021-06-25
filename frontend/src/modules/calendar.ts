@@ -1,4 +1,8 @@
-import { createSlice, miniSerializeError, PayloadAction } from '@reduxjs/toolkit';
+import {
+  createSlice,
+  miniSerializeError,
+  PayloadAction,
+} from '@reduxjs/toolkit';
 import dayjs from 'dayjs';
 
 export type Days = {
@@ -9,13 +13,12 @@ export type Days = {
   text_color: string;
   select: boolean;
   month: number;
+  week: number;
 };
 export type PickDay = {
-  month: number,
-  day: number
-
-
-}
+  month: number;
+  day: number;
+};
 
 type initial = {
   weekOfDay: any[];
@@ -26,6 +29,7 @@ type initial = {
   end_hour: number;
   title: string;
   pickArr: number[];
+  teamMonth: any;
 };
 export type Times = {
   start_hour: string;
@@ -35,17 +39,16 @@ export type Times = {
 export type DaysState = Days[];
 export type TimesState = Times[];
 
-
-
 const initialState: initial = {
   weekOfDay: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
   Days: [],
-  PickDays:{1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [], 11:[], 12:[]},
+  PickDays: {},
   month: dayjs(),
   title: '',
   start_hour: 0,
   end_hour: 0,
   pickArr: [],
+  teamMonth: {},
 };
 
 export const daysSlice = createSlice({
@@ -53,10 +56,10 @@ export const daysSlice = createSlice({
   initialState,
   reducers: {
     setDay: (state, action: PayloadAction<any>) => {
-      state.month = action.payload
+      state.month = action.payload;
     },
     setInitialDate: (state) => {
-      state.Days = []
+      state.Days = [];
     },
     addDays: (state) => {
       state.Days.push();
@@ -69,7 +72,7 @@ export const daysSlice = createSlice({
       const presentMonthStartDay = state.month.startOf('M').day();
       const preDate = state.month.endOf('M').date();
       const preMonth = state.month.month() + 1;
-    
+
       const NextMonth = state.month.add(1, 'M').month() + 1;
 
       let subDate = LastMonthEndDay.date();
@@ -83,19 +86,21 @@ export const daysSlice = createSlice({
           text_color: 'black',
           month: LastMonthNum,
           select: false,
+          week: Math.floor(k / 7) + 1,
         });
         k++;
       }
 
-      
-       if (state.PickDays[preMonth].length!==0) {
-           for (let j=0; j< state.PickDays[preMonth].length; j++){
-             state.pickArr.push(state.PickDays[preMonth][j].key)
-           }
+      if (state.PickDays[preMonth]) {
+        if (state.PickDays[preMonth].length !== 0) {
+          for (let j = 0; j < state.PickDays[preMonth].length; j++) {
+            state.pickArr.push(state.PickDays[preMonth][j].key);
+          }
         }
-        
+      }
+
       for (i = 1; i <= preDate; i++) {
-          state.Days.push({
+        state.Days.push({
           day: i,
           present: true,
           key: k,
@@ -103,14 +108,18 @@ export const daysSlice = createSlice({
           text_color: 'black',
           month: preMonth,
           select: false,
+          week: Math.floor(k / 7) + 1,
         });
         k++;
       }
-      for (i=0; i<state.pickArr.length; i++) {
-        const check = state.Days.find((day)=> day.key === state.pickArr[i]);
-        if (check) check.color ='#5465FF';
+      for (i = 0; i < state.pickArr.length; i++) {
+        const check = state.Days.find((day) => day.key === state.pickArr[i]);
+        if (check) {
+          check.color = '#5465FF';
+          check.text_color = 'white';
+        }
       }
-      state.pickArr=[]
+      state.pickArr = [];
       i = 1;
       while (state.Days.length !== 42) {
         state.Days.push({
@@ -121,12 +130,13 @@ export const daysSlice = createSlice({
           text_color: 'black',
           month: NextMonth,
           select: false,
+          week: Math.floor(k / 7) + 1,
         });
         i++;
         k++;
       }
     },
-    
+
     nextMonth: (state) => {
       state.Days = [];
       state.month = state.month.add(1, 'M');
@@ -144,20 +154,22 @@ export const daysSlice = createSlice({
     },
 
     dragMonth: (state, action: PayloadAction<number>) => {
-     const days = state.Days.find((days) => days.key === action.payload);
+      const days = state.Days.find((days) => days.key === action.payload);
       if (days) {
         if (days.color === '#5465FF') {
           days.color = 'white';
           days.text_color = 'black';
-          const {month} = days;
-          const picking = state.PickDays[month].findIndex((pick:any)=> pick.day === days.day && pick.month === days.month)
+          const { month } = days;
+          const picking = state.PickDays[month].findIndex(
+            (pick: any) => pick.day === days.day && pick.month === days.month
+          );
           if (picking) state.PickDays[month].splice(picking, 1);
-        } else if(days.present) {
+        } else if (days.present) {
           days.color = '#5465FF';
           days.text_color = 'white';
-          const {day,month, key } = days;
-          
-          state.PickDays[month].push({day, month, key})
+          const { day, month, key, week } = days;
+
+          state.PickDays[month].push({ day, month, key, week });
         }
       }
     },
@@ -167,23 +179,31 @@ export const daysSlice = createSlice({
         if (days.color === '#5465FF') {
           days.color = 'white';
           days.text_color = 'black';
-          const {month} = days;
-          const picking = state.PickDays[month].findIndex((pick:any)=> pick.day === days.day && pick.month === days.month)
+          const { month } = days;
+          const picking = state.PickDays[month].findIndex(
+            (pick: any) => pick.day === days.day && pick.month === days.month
+          );
           if (picking) state.PickDays[month].splice(picking, 1);
-        } else if(days.present) {
+        } else if (days.present) {
           days.color = '#5465FF';
           days.text_color = 'white';
-          const {day,month,key } = days;
-          
-          state.PickDays[month].push({day, month, key})
+          const { day, month, key, week } = days;
+          if (!state.PickDays[month]) {
+            state.PickDays[month - 1] = [];
+            state.PickDays[month] = [];
+            state.PickDays[month + 1] = [];
+          }
+          state.PickDays[month].push({ day, month, key, week });
         }
       }
     },
     addTitle: (state, action: PayloadAction<string>) => {
-      state.title= action.payload;
-    }
+      state.title = action.payload;
+    },
+    addUseMonth: (state, action: PayloadAction) => {},
   },
 });
+// 에어팟좀 찾골올게요네
 
 export const {
   addDays,
