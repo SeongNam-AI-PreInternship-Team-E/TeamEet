@@ -137,7 +137,6 @@ def members(request):
         return JsonResponse(serializer.data, safe=False)
 
 
-# @login_decorator
 class SignInView(View):
     def post(self, request, url):
         try:
