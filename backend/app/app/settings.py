@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET_KEY = 'django-insecure-mp4m&^+r36$507ucoyibbown0(@%h@fxvjm%gtl@+4k6((w%cs'
 SECRET_KEY = os.environ.get(
     'SECRET_KEY', 'django-insecure-mp4m&^+r36$507ucoyibbown0(@%h@fxvjm%gtl@+4k6((w%cs')
-
+ALGORITHM = 'HS256'
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = False
 DEBUG = int(os.environ.get("DEBUG", default=1))

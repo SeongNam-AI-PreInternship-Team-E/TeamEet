@@ -23,8 +23,10 @@ urlpatterns = [
     path('pages/', views.pages_list),
     path('pages/<str:url>/', views.pages),
     path('pages/<str:url>/users/', views.pages_users),
+    path('pages/<str:url>/sign-in/', views.SignInView.as_view()),
     path('dates/', views.dates),
     path('members/', views.members),
+    path('members', views.MemberView.as_view()),
 
 ]
 
