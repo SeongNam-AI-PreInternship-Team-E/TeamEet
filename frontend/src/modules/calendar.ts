@@ -42,39 +42,13 @@ export type TimesState = Times[];
 const initialState: initial = {
   weekOfDay: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
   Days: [],
-  PickDays: {
-    1: [],
-    2: [],
-    3: [],
-    4: [],
-    5: [],
-    6: [],
-    7: [],
-    8: [],
-    9: [],
-    10: [],
-    11: [],
-    12: [],
-  },
+  PickDays: {},
   month: dayjs(),
   title: '',
   start_hour: 0,
   end_hour: 0,
   pickArr: [],
-  teamMonth: {
-    1: [],
-    2: [],
-    3: [],
-    4: [],
-    5: [],
-    6: [],
-    7: [],
-    8: [],
-    9: [],
-    10: [],
-    11: [],
-    12: [],
-  },
+  teamMonth: {},
 };
 
 export const daysSlice = createSlice({
@@ -117,9 +91,11 @@ export const daysSlice = createSlice({
         k++;
       }
 
-      if (state.PickDays[preMonth].length !== 0) {
-        for (let j = 0; j < state.PickDays[preMonth].length; j++) {
-          state.pickArr.push(state.PickDays[preMonth][j].key);
+      if (state.PickDays[preMonth]) {
+        if (state.PickDays[preMonth].length !== 0) {
+          for (let j = 0; j < state.PickDays[preMonth].length; j++) {
+            state.pickArr.push(state.PickDays[preMonth][j].key);
+          }
         }
       }
 
@@ -212,7 +188,11 @@ export const daysSlice = createSlice({
           days.color = '#5465FF';
           days.text_color = 'white';
           const { day, month, key, week } = days;
-
+          if (!state.PickDays[month]) {
+            state.PickDays[month - 1] = [];
+            state.PickDays[month] = [];
+            state.PickDays[month + 1] = [];
+          }
           state.PickDays[month].push({ day, month, key, week });
         }
       }
@@ -223,6 +203,7 @@ export const daysSlice = createSlice({
     addUseMonth: (state, action: PayloadAction) => {},
   },
 });
+// 에어팟좀 찾골올게요네
 
 export const {
   addDays,
