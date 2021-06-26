@@ -13,7 +13,7 @@ import {
   prevWeek,
   clickWeek,
 } from '../../modules/timetable';
-import { addTimes, cloneDays } from '../../modules/individual';
+import { addTimes, cloneWeek } from '../../modules/individual';
 interface Props {}
 
 function useTimeCalendar() {
@@ -29,7 +29,10 @@ function useTimeCalendar() {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(addUseMonth());
-    dispatch(cloneDays(PickWeek));
+    console.log(PickWeek);
+    PickWeek.length === 0 && dispatch(clickWeek(1));
+
+    dispatch(cloneWeek(PickWeek));
     dispatch(addTimes());
     // dispatch(clickWeek(presentWeek));
   }, [dispatch, PickWeek, presentWeek]);
@@ -47,10 +50,10 @@ function useTimeCalendar() {
   const onChangeWeek = (week: number) => {
     dispatch(clickWeek(week));
     dispatch(changeWeekColor());
-    dispatch(cloneDays(PickWeek));
+    dispatch(cloneWeek(PickWeek));
     dispatch(addTimes());
   };
-  console.log(presentWeek);
+
   return {
     teamMonth,
     month,

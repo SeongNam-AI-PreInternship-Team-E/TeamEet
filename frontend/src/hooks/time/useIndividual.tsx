@@ -3,12 +3,19 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../modules';
 import styled from 'styled-components';
 import { InPresent } from './InPresent';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { addTimes } from '../../modules/individual';
 export const useIndividual = () => {
   const { PickWeek, PickTime } = useSelector((state: RootState) => ({
     PickWeek: state.individual.PickWeek,
     PickTime: state.individual.PickTime,
   }));
-
+  const dispatch = useDispatch();
+  useEffect(() => {});
+  // useEffect(() => {
+  //   dispatch(cloneDays(PickWeek));
+  // }, [dispatch, PickWeek]);
   return { PickWeek, PickTime };
 };
 
@@ -35,8 +42,20 @@ const Time = styled.div`
 `;
 
 const DayOfWeek = styled.div`
+  margin-top: 3rem;
   font-size: 1.2rem;
   font-weight: bolder;
+  box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.25);
+  :nth-child(1) {
+    box-shadow: none;
+    color: white;
+  }
+  :nth-child(2) {
+    color: red;
+  }
+  :nth-child(8) {
+    color: blue;
+  }
 `;
 export default function Individual() {
   const { PickWeek, PickTime } = useIndividual();
@@ -45,7 +64,7 @@ export default function Individual() {
       <TimeTableContainer>
         <Time>
           {PickWeek.map((day: any) => (
-            <DayOfWeek key={day.day}>{day}</DayOfWeek>
+            <DayOfWeek key={day.day}>{day.day}</DayOfWeek>
           ))}
 
           {PickTime.map((time: any) => (
