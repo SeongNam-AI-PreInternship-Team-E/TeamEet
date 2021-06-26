@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { InPresent } from './InPresent';
 export const useIndividual = () => {
   const { PickWeek, PickTime } = useSelector((state: RootState) => ({
-    PickWeek: state.timetable.PickWeek,
+    PickWeek: state.individual.PickWeek,
     PickTime: state.individual.PickTime,
   }));
 
@@ -14,8 +14,8 @@ export const useIndividual = () => {
 
 const TimeTableWrapper = styled.div`
   display: flex;
-  width: 50%;
-  height: 40%;
+  width: 60%;
+  height: 100%;
   padding: 1rem;
 `;
 
@@ -28,9 +28,8 @@ const TimeTableContainer = styled.div`
 
 const Time = styled.div`
   display: grid;
-
-  grid-template-columns: repeat(50, 1fr);
-  grid-template-rows: repeat(50, 1fr);
+  max-height: 30rem;
+  grid-template-columns: repeat(8, 1fr);
   box-sizing: border-box;
   text-align: center;
 `;
@@ -46,7 +45,7 @@ export default function Individual() {
       <TimeTableContainer>
         <Time>
           {PickWeek.map((day: any) => (
-            <DayOfWeek key={day.day}>{day.day}</DayOfWeek>
+            <DayOfWeek key={day.day}>{day}</DayOfWeek>
           ))}
 
           {PickTime.map((time: any) => (
