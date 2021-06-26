@@ -90,7 +90,11 @@ export const timetableSlice = createSlice({
       for (let i = 0; i <= 42; i++) {
         if (state.teamMonth[preMonth][i]) {
           if (state.teamMonth[preMonth][i].week === action.payload) {
-            state.PickWeek.push({ day: state.teamMonth[preMonth][i].day });
+            state.PickWeek.push({
+              day: state.teamMonth[preMonth][i].day,
+              week: state.presentWeek,
+              month: state.month.month() + 1,
+            });
           }
         }
       }
