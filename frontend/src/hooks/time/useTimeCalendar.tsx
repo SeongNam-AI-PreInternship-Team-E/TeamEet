@@ -64,7 +64,7 @@ function useTimeCalendar() {
 
 const CalendarWrapper = styled.div`
   display: flex;
-  width: 50%;
+  width: 40%;
   height: 80%;
   padding: 1rem;
 `;
