@@ -5,6 +5,8 @@ import Button from '../../lib/styles/Button';
 import UseHour from './UseHour';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../modules';
+import { setEnd, setStart } from '../../modules/individual';
+import { useDispatch } from 'react-redux';
 
 interface Props {}
 
@@ -13,9 +15,8 @@ export function useModal() {
     title: state.calendar.title,
   }));
   const [modal, setModal] = useState(false);
-  const [start, setStart] = useState('');
-  const [end, setEnd] = useState('');
 
+  const dispatch = useDispatch();
   const onNextClick = () => {
     if (title === '') {
       alert('입력칸이 비어 있습니다.');
@@ -29,19 +30,19 @@ export function useModal() {
   const onConfirm = () => {
     setModal(false);
   };
-  const onSetStart = (time: string) => {
-    setStart(time);
+  const onSetStart = (time: number) => {
+    dispatch(setStart(time));
+    console.log(time);
   };
-  const onSetEnd = (time: string) => {
-    setEnd(time);
+  const onSetEnd = (time: number) => {
+    dispatch(setEnd(time));
+    console.log(time);
   };
   return {
     modal,
     onNextClick,
     onCancel,
     onConfirm,
-    start,
-    end,
     onSetStart,
     onSetEnd,
     title,
@@ -123,13 +124,18 @@ const StyledButton = styled(Button)`
 `;
 
 export default function Modal({ visible, onCancel, onConfirm }: any) {
-  const { modal, onNextClick, start, end, onSetStart, onSetEnd, title } =
-    useModal();
+  const {
+    modal,
+    onNextClick,
+
+    onSetStart,
+    onSetEnd,
+    title,
+  } = useModal();
   if (!visible) return null;
   return (
     <FullScreen>
       <AskModalBlock>
-        {console.log(start, end)}
         <UseHour onSetStart={onSetStart} onSetEnd={onSetEnd}></UseHour>
         <h2>모임 제목 : </h2>
         <h3>{title}</h3>
