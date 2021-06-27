@@ -25,7 +25,7 @@ class calendar_dates(models.Model):
     day = models.CharField(max_length=20)
     day_of_week = models.CharField(max_length=20)
     private_page = models.ForeignKey(
-        private_pages, on_delete=models.CASCADE)
+        private_pages, on_delete=models.CASCADE, related_name='dates')
 
     class Meta:
         db_table = 'calendar_dates'
@@ -35,8 +35,19 @@ class calendar_dates(models.Model):
 class group_members(models.Model):
     name = models.CharField(max_length=20)
     password = models.CharField(max_length=20)
-    private_page = models.ForeignKey(private_pages, on_delete=models.CASCADE)
+    private_page = models.ForeignKey(
+        private_pages, on_delete=models.CASCADE, related_name='members')
 
     class Meta:
         db_table = 'group_members'
-        verbose_name = '로그인 테스트 테이블'
+        verbose_name = '그룹 멤버 테이블'
+
+
+class available_times(models.Model):
+    time = models.CharField(max_length=20)
+    group_member = models.ForeignKey(
+        group_members, on_delete=models.CASCADE, related_name='available_time')
+
+    class Meta:
+        db_table = 'available_times'
+        verbose_name = '공용 일정표 테이블'
