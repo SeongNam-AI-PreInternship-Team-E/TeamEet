@@ -1,22 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../modules';
 import styled from 'styled-components';
 import { InPresent } from './InPresent';
-import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { addTimes } from '../../modules/individual';
+import { dragTimes } from '../../modules/individual';
+
 export const useIndividual = () => {
   const { PickWeek, PickTime } = useSelector((state: RootState) => ({
     PickWeek: state.individual.PickWeek,
     PickTime: state.individual.PickTime,
   }));
+  const [isDown, onChangeDown] = useState({
+    drag: false,
+    key: 9999,
+  });
   const dispatch = useDispatch();
-  useEffect(() => {});
-  // useEffect(() => {
-  //   dispatch(cloneDays(PickWeek));
-  // }, [dispatch, PickWeek]);
-  return { PickWeek, PickTime };
+  const onClickDrag = (time: number, day: number) => {
+    dispatch(dragTimes({ time, day }));
+  };
+  return { PickWeek, PickTime, onClickDrag, isDown, onChangeDown };
 };
 
 const TimeTableWrapper = styled.div`
@@ -58,7 +61,13 @@ const DayOfWeek = styled.div`
   }
 `;
 export default function Individual() {
-  const { PickWeek, PickTime } = useIndividual();
+  const {
+    PickWeek,
+    PickTime,
+    onClickDrag,
+    isDown,
+    onChangeDown,
+  } = useIndividual();
   return (
     <TimeTableWrapper>
       <TimeTableContainer>
@@ -67,8 +76,14 @@ export default function Individual() {
             <DayOfWeek key={day.day}>{day.day}</DayOfWeek>
           ))}
 
-          {PickTime.map((time: any) => (
-            <InPresent time={time}></InPresent>
+          {PickTime.map((time: any, index: number) => (
+            <InPresent
+              isDown={isDown}
+              onChangeDown={onChangeDown}
+              onClickDrag={onClickDrag}
+              time={time}
+              key={index}
+            ></InPresent>
           ))}
         </Time>
       </TimeTableContainer>
