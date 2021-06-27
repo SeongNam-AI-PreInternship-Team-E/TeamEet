@@ -182,3 +182,43 @@ class MemberView(View):
     def get(self, request):
         print("get-test")
         return JsonResponse({'group_member': list(group_members.objects.values())}, status=200)
+
+
+class RegisterView(View):
+    @login_decorator
+    def post(self, request, url):
+        try:
+            # 고유 url에 대한 private_pages 튜플 정보 가져옴
+            page = private_pages.objects.get(url=url)
+        except private_pages.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # url, year, month, day, day_of_week, name, start/end_time
+        data = json.loads(request.body)
+        page_serializer = GetPagesSerializer(page)
+        private_page = private_pages.objects.get(
+            url=page_serializer.data['url'])
+        joined_page = private_pages.objects.select_related()
+        # joined_everything = private_pages.objects.get(
+        #    url=page_serializer.data['url'])
+        join = private_pages.objects.get(
+            url=page_serializer.data['url']).members.get()
+
+        print('\n\n\n\\')
+        print('*****    joined_page_with_date    ******')
+        print(private_page)
+        print('\n\n\n\\')
+        print("private type:    ", type(private_page))
+        # print("private.query type:    ", type(private_page.query))
+        print('joined_page type: ', type(joined_page))
+        print('join type: ', type(join))
+        print('\n\n\n\\')
+
+        print('\n\n\n\\')
+        print('*****    data    ******')
+        print(data)
+        print('\n\n\n\\')
+        print('*****    page.data    ******')
+        print(page_serializer)
+        print('\n\n\n\\')
+        return HttpResponse('successfully register')
