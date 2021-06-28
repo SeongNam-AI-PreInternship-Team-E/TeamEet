@@ -12,7 +12,12 @@ import {
   clickNextMonth,
   clickWeek,
 } from '../../modules/timetable';
-import { addNormalTime, addTimes, cloneWeek } from '../../modules/individual';
+import {
+  addNormalTime,
+  addTimes,
+  cloneWeek,
+  setTimeColor,
+} from '../../modules/individual';
 
 function useTimeCalendar() {
   const { teamMonth, month, weekOfDay, PickWeek, canPickWeek } = useSelector(
@@ -27,12 +32,13 @@ function useTimeCalendar() {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(addUseMonth());
-    console.log(PickWeek);
+
     PickWeek.length === 0 && dispatch(clickWeek(1));
 
     dispatch(cloneWeek(PickWeek));
     dispatch(addTimes());
     dispatch(addNormalTime());
+    dispatch(setTimeColor());
     // dispatch(clickWeek(presentWeek));
   }, [dispatch, PickWeek]);
   useEffect(() => {
