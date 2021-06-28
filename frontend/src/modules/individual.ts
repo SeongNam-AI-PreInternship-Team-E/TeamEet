@@ -1,6 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import lodash, { attempt } from 'lodash';
-import { isWhiteSpaceLike } from 'typescript';
+import lodash from 'lodash';
+
+type changeDay = {
+  check: boolean;
+  day: number;
+};
 type initial = {
   PickWeek: any;
   PickTime: any;
@@ -11,6 +15,7 @@ type initial = {
   month: any;
   presentWeek: number;
   canPickWeek: any;
+  change: changeDay;
 };
 
 const initialState: initial = {
@@ -23,6 +28,7 @@ const initialState: initial = {
   month: 6,
   presentWeek: 1,
   canPickWeek: {},
+  change: { check: false, day: 0 },
 };
 
 export const individualSlice = createSlice({
@@ -161,14 +167,88 @@ export const individualSlice = createSlice({
         }
       }
     },
-    addIndividualTime: (
+    clickIndividualTime: (
       state,
       action: PayloadAction<{ time: number; day: number }>
     ) => {
-      if (!state.IndividualTime[action.payload.day]) {
-        state.IndividualTime[action.payload.day] = [];
-      } else {
-        state.IndividualTime[action.payload.day].push(action.payload.time);
+      let selectDay = 0;
+
+      for (let i = 1; i <= 7; i++) {
+        if (state.PickTime[i]) {
+          const days = state.PickTime[i].find(
+            (da: any) => da.day === action.payload.day
+          );
+          if (days) {
+            selectDay = i;
+            break;
+          }
+        }
+      }
+      if (action.payload.day !== 9999) {
+        const times = state.PickTime[selectDay].find(
+          (ti: any) => ti.time === action.payload.time
+        );
+        if (times) {
+          if (times.color === '#5465FF') {
+            times.color = 'white';
+            const { day, time } = times;
+            const picking = state.IndividualTime[state.month][day].findIndex(
+              (pick: any) =>
+                pick.time === times.time && pick.month === times.month
+            );
+            let len = state.IndividualTime[state.month][day].length;
+            if (picking)
+              state.IndividualTime[state.month][day].splice(picking, 1);
+            if (len === 1) state.IndividualTime[state.month][day].pop();
+          } else {
+            times.color = '#5465FF';
+            if (!state.IndividualTime) state.IndividualTime = [];
+            if (!state.IndividualTime[state.month]) {
+              state.IndividualTime[state.month] = [];
+              const { day, time } = times;
+              if (!state.IndividualTime[state.month][day]) {
+                state.IndividualTime[state.month][day] = [];
+                state.IndividualTime[state.month][day].push({
+                  day,
+                  time,
+                  index: 0,
+                });
+                state.change.check = true;
+                state.change.day = day;
+              } else {
+                let index = state.IndividualTime[state.month][day].length;
+                state.IndividualTime[state.month][day].push({
+                  day,
+                  time,
+                  index,
+                });
+                state.change.check = true;
+                state.change.day = day;
+              }
+            } else {
+              const { day, time } = times;
+              if (!state.IndividualTime[state.month][day]) {
+                state.IndividualTime[state.month][day] = [];
+                state.IndividualTime[state.month][day].push({
+                  day,
+                  time,
+                  index: 0,
+                });
+                state.change.check = true;
+                state.change.day = day;
+              } else {
+                let index = state.IndividualTime[state.month][day].length;
+                state.IndividualTime[state.month][day].push({
+                  day,
+                  time,
+                  index,
+                });
+                state.change.check = true;
+                state.change.day = day;
+              }
+            }
+          }
+        }
       }
     },
     dragTimes: (
@@ -196,28 +276,112 @@ export const individualSlice = createSlice({
           if (times.color === '#5465FF') {
             times.color = 'white';
             const { day, time } = times;
-            const picking = state.IndividualTime[day].findIndex(
+            const picking = state.IndividualTime[state.month][day].findIndex(
               (pick: any) =>
                 pick.time === times.time && pick.month === times.month
             );
-
-            if (picking) state.IndividualTime[day].splice(picking, 1);
+            let len = state.IndividualTime[state.month][day].length;
+            if (picking)
+              state.IndividualTime[state.month][day].splice(picking, 1);
+            if (len === 1) state.IndividualTime[state.month][day].pop();
           } else {
             times.color = '#5465FF';
-
-            if (!state.IndividualTime) {
-              state.IndividualTime = [];
+            if (!state.IndividualTime) state.IndividualTime = [];
+            if (!state.IndividualTime[state.month]) {
+              state.IndividualTime[state.month] = [];
+              const { day, time } = times;
+              if (!state.IndividualTime[state.month][day]) {
+                state.IndividualTime[state.month][day] = [];
+                state.IndividualTime[state.month][day].push({
+                  day,
+                  time,
+                  index: 0,
+                });
+              } else {
+                let index = state.IndividualTime[state.month][day].length;
+                state.IndividualTime[state.month][day].push({
+                  day,
+                  time,
+                  index,
+                });
+              }
             } else {
               const { day, time } = times;
-              if (!state.IndividualTime[day]) {
-                state.IndividualTime[day] = [];
-                state.IndividualTime[day].push({ day, time });
+              if (!state.IndividualTime[state.month][day]) {
+                state.IndividualTime[state.month][day] = [];
+                state.IndividualTime[state.month][day].push({
+                  day,
+                  time,
+                  index: 0,
+                });
               } else {
-                state.IndividualTime[day].push({ day, time });
+                let index = state.IndividualTime[state.month][day].length;
+                state.IndividualTime[state.month][day].push({
+                  day,
+                  time,
+                  index,
+                });
               }
             }
           }
         }
+      }
+    },
+    addIndividualTime: (
+      state,
+      action: PayloadAction<{ time: number; day: number }>
+    ) => {
+      if (!state.IndividualTime[action.payload.day]) {
+        state.IndividualTime[action.payload.day] = [];
+      } else {
+        state.IndividualTime[action.payload.day].push(action.payload.time);
+      }
+    },
+
+    setTimeColor: (state) => {
+      let selectDay = 8888;
+      var day = 8888;
+      if (state.PickWeek[7]) {
+        state.PickWeek.forEach((element: any) => {
+          if (state.IndividualTime[state.month]) {
+            for (let i = 1; i <= 7; i++) {
+              if (state.PickTime[i]) {
+                const days = state.PickTime[i].find(
+                  (da: any) => da.day === element.day
+                );
+                if (days) {
+                  selectDay = i;
+                  day = element.day;
+                  break;
+                }
+              }
+            }
+            if (selectDay !== 8888) {
+              if (state.IndividualTime[state.month][day]) {
+                for (
+                  let j = 0;
+                  j < state.IndividualTime[state.month][day].length;
+                  j++
+                ) {
+                  if (state.PickTime[selectDay][j]) {
+                    const find = state.PickTime[selectDay].findIndex(
+                      (fi: any) =>
+                        fi.time ===
+                        state.IndividualTime[state.month][day][j].time
+                    );
+                    if (find === 0) {
+                      state.PickTime[selectDay][0].color = '#5465FF';
+                    }
+
+                    if (find) {
+                      state.PickTime[selectDay][find].color = '#5465FF';
+                    }
+                  }
+                }
+              }
+            }
+          }
+        });
       }
     },
   },
@@ -231,6 +395,8 @@ export const {
   cloneDays,
   addNormalTime,
   dragTimes,
+  clickIndividualTime,
+  setTimeColor,
 } = individualSlice.actions;
 
 export default individualSlice.reducer;

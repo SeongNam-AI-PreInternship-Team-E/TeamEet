@@ -5,6 +5,7 @@ interface Props {
   onClickDrag: (time: number, day: number) => void;
   isDown: any;
   onChangeDown: any;
+  onClickTime: (time: number, day: number) => void;
 }
 
 const Name = styled.div<{
@@ -50,6 +51,7 @@ export const InPresent = ({
   isDown,
   onChangeDown,
   onClickDrag,
+  onClickTime,
 }: Props) => {
   return (
     <div>
@@ -64,7 +66,7 @@ export const InPresent = ({
           onMouseDown={(e) => {
             e.preventDefault();
             onChangeDown({ drag: true, key: ti.time });
-            onClickDrag(ti.time, ti.day);
+            onClickTime(ti.time, ti.day);
           }}
           onMouseMove={() => {
             if (isDown.drag === true) {

@@ -4,7 +4,7 @@ import { RootState } from '../../modules';
 import styled from 'styled-components';
 import { InPresent } from './InPresent';
 import { useDispatch } from 'react-redux';
-import { dragTimes } from '../../modules/individual';
+import { clickIndividualTime, dragTimes } from '../../modules/individual';
 
 export const useIndividual = () => {
   const { PickWeek, PickTime } = useSelector((state: RootState) => ({
@@ -19,7 +19,10 @@ export const useIndividual = () => {
   const onClickDrag = (time: number, day: number) => {
     dispatch(dragTimes({ time, day }));
   };
-  return { PickWeek, PickTime, onClickDrag, isDown, onChangeDown };
+  const onClickTime = (time: number, day: number) => {
+    dispatch(clickIndividualTime({ time, day }));
+  };
+  return { PickWeek, PickTime, onClickDrag, isDown, onChangeDown, onClickTime };
 };
 
 const TimeTableWrapper = styled.div`
@@ -61,13 +64,8 @@ const DayOfWeek = styled.div`
   }
 `;
 export default function Individual() {
-  const {
-    PickWeek,
-    PickTime,
-    onClickDrag,
-    isDown,
-    onChangeDown,
-  } = useIndividual();
+  const { PickWeek, PickTime, onClickDrag, isDown, onChangeDown, onClickTime } =
+    useIndividual();
   return (
     <TimeTableWrapper>
       <TimeTableContainer>
@@ -83,6 +81,7 @@ export default function Individual() {
               onClickDrag={onClickDrag}
               time={time}
               key={index}
+              onClickTime={onClickTime}
             ></InPresent>
           ))}
         </Time>
