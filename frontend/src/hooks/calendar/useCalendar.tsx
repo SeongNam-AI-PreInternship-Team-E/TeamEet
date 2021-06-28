@@ -160,7 +160,7 @@ const Header = styled.div`
   display: flex;
 
   margin-bottom: 1rem;
-  padding-bottom: 1rem;
+
   width: 100%;
   justify-content: center;
   align-items: center;
@@ -203,7 +203,11 @@ const Cal = styled.div`
 
 const DayOfWeek = styled.div`
   font-size: 1.2rem;
+  display: flex;
   font-weight: bolder;
+  align-items: center;
+
+  justify-content: center;
 `;
 
 export const Calendar = (props: Props) => {
