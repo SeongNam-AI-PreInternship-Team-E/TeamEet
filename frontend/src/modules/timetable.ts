@@ -26,7 +26,7 @@ type AvaliableTime = {
   end: number;
 };
 
-type initial = {
+export type initialTimeTable = {
   weekOfDay: any;
   teamMonth: any;
   startHour: number;
@@ -38,7 +38,7 @@ type initial = {
   canPickWeek: any;
 };
 
-const initialState: initial = {
+const initialState: initialTimeTable = {
   weekOfDay: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
   teamMonth: {},
   startHour: 0,
@@ -174,7 +174,7 @@ export const timetableSlice = createSlice({
           if (check) {
             check.color = '#5465FF';
             check.text_color = 'white';
-            check.opacity = 1;
+            check.opacity = 0.4;
             let thisWeek = state.PickDays[preMonth][i].week;
             state.canPickWeek[thisWeek] = true;
           }
