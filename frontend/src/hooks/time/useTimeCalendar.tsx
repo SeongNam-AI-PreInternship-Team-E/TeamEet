@@ -8,8 +8,8 @@ import { useEffect } from 'react';
 import {
   addUseMonth,
   changeWeekColor,
-  nextWeek,
-  prevWeek,
+  clickLastMonth,
+  clickNextMonth,
   clickWeek,
 } from '../../modules/timetable';
 import { addNormalTime, addTimes, cloneWeek } from '../../modules/individual';
@@ -39,11 +39,13 @@ function useTimeCalendar() {
     dispatch(changeWeekColor());
   }, [dispatch]);
   const onClickNextWeek = () => {
-    dispatch(nextWeek());
+    dispatch(clickNextMonth());
+    dispatch(addUseMonth());
     dispatch(changeWeekColor());
   };
   const onClickPrevWeek = () => {
-    dispatch(prevWeek());
+    dispatch(clickLastMonth());
+    dispatch(addUseMonth());
     dispatch(changeWeekColor());
   };
   const onChangeWeek = (week: number) => {
@@ -136,12 +138,10 @@ const CalendarContainer = styled.div`
 const Header = styled.div`
   display: flex;
 
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
   width: 100%;
   justify-content: center;
   align-items: center;
-
+  font-size: 1rem;
   h3 {
     z-index: 999;
     box-sizing: border-box;
@@ -189,7 +189,10 @@ const Cal = styled.div`
 
 const DayOfWeek = styled.div`
   font-size: 1.2rem;
+  display: flex;
   font-weight: bolder;
+  align-items: center;
+  justify-content: center;
 `;
 
 const DayBox = styled.div<{
@@ -219,10 +222,10 @@ const DayBox = styled.div<{
   ${(props) =>
     props.select &&
     css`
-      border: 0.5rem solid black;
       padding-top: 0.2rem;
       padding-bottom: 0.2rem;
       border-width: 10px 0px;
+      opacity: 1;
       box-sizing: border-box;
     `}
   ${(props) =>
@@ -269,14 +272,14 @@ export default function TimeCalendar() {
             onClick={onClickPrevWeek}
             style={{ cursor: 'pointer' }}
           ></AiFillCaretLeft>
-          {/* {month.locale('en').format('MMM')} */}
+          {month.locale('en').format('MMM')}
           &nbsp;
-          {/* {month.format('MM')} */}
+          {month.format('MM')}
           <AiFillCaretRight
             onClick={onClickNextWeek}
             style={{ cursor: 'pointer' }}
           ></AiFillCaretRight>
-          {/* <h2>{month.format('YYYY')}</h2> */}
+          <h2>{month.format('YYYY')}</h2>
         </Header>
         <Cal>
           {weekOfDay.map((week): any => (
