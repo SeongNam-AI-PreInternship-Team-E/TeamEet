@@ -68,40 +68,13 @@ export const timetableSlice = createSlice({
     clonePickDays: (state, action: PayloadAction<any>) => {
       state.PickDays = lodash.cloneDeep(action.payload);
     },
-    nextWeek: (state) => {
-      if (state.presentWeek === 5) return;
-      state.presentWeek = state.presentWeek + 1;
-      state.PickWeek = [];
-      const preMonth = state.month.month() + 1;
-      for (let i = 0; i <= 42; i++) {
-        if (state.teamMonth[preMonth][i]) {
-          if (state.teamMonth[preMonth][i].week === preMonth) {
-            state.PickWeek.push({
-              day: state.teamMonth[preMonth][i].day,
-              week: state.presentWeek,
-              month: state.teamMonth[preMonth][i].month,
-            });
-          }
-        }
-      }
+    clickLastMonth: (state) => {
+      state.month = state.month.subtract(1, 'M');
     },
-    prevWeek: (state) => {
-      if (state.presentWeek === 1) return;
-      state.presentWeek = state.presentWeek - 1;
-      state.PickWeek = [];
-      const preMonth = state.month.month() + 1;
-      for (let i = 0; i <= 42; i++) {
-        if (state.teamMonth[preMonth][i]) {
-          if (state.teamMonth[preMonth][i].week === preMonth) {
-            state.PickWeek.push({
-              day: state.teamMonth[preMonth][i].day,
-              week: state.presentWeek,
-              month: state.teamMonth[preMonth][i].month,
-            });
-          }
-        }
-      }
+    clickNextMonth: (state) => {
+      state.month = state.month.add(1, 'M');
     },
+
     // clickWeek: (state, action: PayloadAction<any>) => {
     //   const preMonth = state.month.month() + 1;
     //   const presentWeek = state.teamMonth[preMonth].find(
@@ -162,7 +135,7 @@ export const timetableSlice = createSlice({
       const selectWeek = state.presentWeek;
       for (let i = 0; i < 42; i++) {
         state.teamMonth[preMonth][i].color = 'white';
-        state.teamMonth[preMonth][i].opacity = 0.6;
+        state.teamMonth[preMonth][i].opacity = 0.3;
         state.teamMonth[preMonth][i].select = false;
       }
       for (
@@ -170,7 +143,7 @@ export const timetableSlice = createSlice({
         i < state.presentWeek * 7;
         i++
       ) {
-        state.teamMonth[preMonth][i].color = '#5465FF';
+        // state.teamMonth[preMonth][i].color = '#5465FF';
         state.teamMonth[preMonth][i].opacity = 0.6;
         state.teamMonth[preMonth][i].select = true;
       }
@@ -293,6 +266,7 @@ export const timetableSlice = createSlice({
             if (check) {
               check.color = '#5465FF';
               check.text_color = 'white';
+              check.opacity = 0.5;
             }
           }
         }
@@ -322,8 +296,9 @@ export const {
   clonePickDays,
   addUseMonth,
   changeWeekColor,
-  nextWeek,
-  prevWeek,
+  clickLastMonth,
+  clickNextMonth,
+
   clickWeek,
   // clickWeek2,
 } = timetableSlice.actions;
