@@ -27,21 +27,15 @@ import {
 import { setInitialDate } from '../../modules/calendar';
 
 function useTimeCalendar() {
-  const {
-    teamMonth,
-    month,
-    weekOfDay,
-    PickWeek,
-    canPickWeek,
-    PickDays,
-  } = useSelector((state: RootState) => ({
-    teamMonth: state.timetable.teamMonth,
-    month: state.timetable.month,
-    weekOfDay: state.timetable.weekOfDay,
-    PickWeek: state.timetable.PickWeek,
-    canPickWeek: state.timetable.canPickWeek,
-    PickDays: state.calendar.PickDays,
-  }));
+  const { teamMonth, month, weekOfDay, PickWeek, canPickWeek, PickDays } =
+    useSelector((state: RootState) => ({
+      teamMonth: state.timetable.teamMonth,
+      month: state.timetable.month,
+      weekOfDay: state.timetable.weekOfDay,
+      PickWeek: state.timetable.PickWeek,
+      canPickWeek: state.timetable.canPickWeek,
+      PickDays: state.calendar.PickDays,
+    }));
   const dispatch = useDispatch();
 
   let weekOfDays: any;
@@ -285,6 +279,7 @@ export default function TimeCalendar() {
   return (
     <CalendarWrapper>
       <CalendarContainer>
+        {console.log(typeof month, month)}
         {/* <TitleContainer>
       <h5 />
       <h4 />
@@ -316,8 +311,8 @@ export default function TimeCalendar() {
           <h2>{month.format('YYYY')}</h2>
         </Header>
         <Cal>
-          {weekOfDays &&
-            Object.entries(weekOfDays).map((week: any) => (
+          {weekOfDay &&
+            weekOfDay.map((week: any) => (
               <DayOfWeek
                 style={
                   week === 'Sa'
@@ -331,22 +326,23 @@ export default function TimeCalendar() {
                 {week}
               </DayOfWeek>
             ))}
-          {teamMonth[month.month() + 1].map((day: any) => (
-            <DayBox
-              onClick={() => {
-                canPickWeek[day.week] && onChangeWeek(day.week);
-              }}
-              canPickWeek={canPickWeek[day.week]}
-              key={day.key}
-              color={day.color}
-              text_color={day.text_color}
-              opacity={day.opacity}
-              week={day.week}
-              select={day.select}
-            >
-              {day.day}
-            </DayBox>
-          ))}
+          {teamMonth[month.month() + 1] &&
+            teamMonth[month.month() + 1].map((day: any) => (
+              <DayBox
+                onClick={() => {
+                  canPickWeek[day.week] && onChangeWeek(day.week);
+                }}
+                canPickWeek={canPickWeek[day.week]}
+                key={day.key}
+                color={day.color}
+                text_color={day.text_color}
+                opacity={day.opacity}
+                week={day.week}
+                select={day.select}
+              >
+                {day.day}
+              </DayBox>
+            ))}
         </Cal>
       </CalendarContainer>
     </CalendarWrapper>
