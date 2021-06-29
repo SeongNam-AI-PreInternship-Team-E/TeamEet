@@ -20,7 +20,9 @@ const Name = styled.div<{
           color: white;
           cursor: pointer;
           text-indent: -10000px;
-
+          &:hover {
+            text-indent: 0px;
+          }
           box-shadow: inset -1px -1px 0px 0px rgba(0, 0, 0, 0.25);
           ${props.isWeekend && css``}
         `
