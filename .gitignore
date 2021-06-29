@@ -3,6 +3,6 @@ __pycache__
 venv
 db.sqlite3
 *.pem
-migrations/
 backend/app/db.sqlite3
 .vscode/settings.json
+mysql/
