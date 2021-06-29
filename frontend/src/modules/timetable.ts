@@ -36,6 +36,7 @@ export type initialTimeTable = {
   presentWeek: number;
   PickWeek: any;
   canPickWeek: any;
+  canPickMonth: any;
 };
 
 const initialState: initialTimeTable = {
@@ -55,6 +56,7 @@ const initialState: initialTimeTable = {
     5: false,
     6: false,
   },
+  canPickMonth: [],
 };
 
 export const timetableSlice = createSlice({
@@ -74,7 +76,13 @@ export const timetableSlice = createSlice({
     clickNextMonth: (state) => {
       state.month = state.month.add(1, 'M');
     },
-
+    canChoosePick: (state) => {
+      if (state.PickDays) {
+        Object.entries(state.PickDays).forEach((element: any) => {
+          if (element.length !== 0) state.canPickMonth.push(element[0].month);
+        });
+      }
+    },
     // clickWeek: (state, action: PayloadAction<any>) => {
     //   const preMonth = state.month.month() + 1;
     //   const presentWeek = state.teamMonth[preMonth].find(
@@ -298,7 +306,7 @@ export const {
   changeWeekColor,
   clickLastMonth,
   clickNextMonth,
-
+  canChoosePick,
   clickWeek,
   // clickWeek2,
 } = timetableSlice.actions;
