@@ -6,4 +6,3 @@ db.sqlite3
 backend/app/db.sqlite3
 .vscode/settings.json
 mysql/
-migrations/
