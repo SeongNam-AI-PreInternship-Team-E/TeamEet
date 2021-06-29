@@ -4,52 +4,78 @@ import Button from '../../lib/styles/Button';
 import { AiFillCaretLeft, AiFillCaretRight } from 'react-icons/ai';
 import styled, { css } from 'styled-components';
 import TeamCalendarPresent from './TeamCalendarPresent';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import qs from 'qs';
 import {
   addUseMonth,
+  canChoosePick,
   changeWeekColor,
   clickLastMonth,
   clickNextMonth,
   clickWeek,
+  clonePickDays,
 } from '../../modules/timetable';
 import {
   addNormalTime,
   addTimes,
+  cloneDays,
   cloneWeek,
+  nextMonth,
+  prevMonth,
   setTimeColor,
 } from '../../modules/individual';
+import { setInitialDate } from '../../modules/calendar';
 
 function useTimeCalendar() {
-  const { teamMonth, month, weekOfDay, PickWeek, canPickWeek } = useSelector(
-    (state: RootState) => ({
-      teamMonth: state.timetable.teamMonth,
-      month: state.timetable.month,
-      weekOfDay: state.calendar.weekOfDay,
-      PickWeek: state.timetable.PickWeek,
-      canPickWeek: state.timetable.canPickWeek,
-    })
-  );
+  const {
+    teamMonth,
+    month,
+    weekOfDay,
+    PickWeek,
+    canPickWeek,
+    PickDays,
+  } = useSelector((state: RootState) => ({
+    teamMonth: state.timetable.teamMonth,
+    month: state.timetable.month,
+    weekOfDay: state.timetable.weekOfDay,
+    PickWeek: state.timetable.PickWeek,
+    canPickWeek: state.timetable.canPickWeek,
+    PickDays: state.calendar.PickDays,
+  }));
   const dispatch = useDispatch();
+
+  let weekOfDays: any;
+  useEffect(() => {
+    weekOfDays = window.localStorage.getItem('week');
+    weekOfDays = qs.parse(weekOfDay);
+    setInitialDate();
+    clonePickDays(PickDays);
+    cloneDays(PickDays);
+    return () => {
+      window.localStorage.setItem('week', weekOfDay);
+    };
+  });
   useEffect(() => {
     dispatch(addUseMonth());
-
     PickWeek.length === 0 && dispatch(clickWeek(1));
-
     dispatch(cloneWeek(PickWeek));
     dispatch(addTimes());
     dispatch(addNormalTime());
     dispatch(setTimeColor());
+    dispatch(canChoosePick());
     // dispatch(clickWeek(presentWeek));
   }, [dispatch, PickWeek]);
   useEffect(() => {
     dispatch(changeWeekColor());
   }, [dispatch]);
   const onClickNextWeek = () => {
+    dispatch(nextMonth());
     dispatch(clickNextMonth());
     dispatch(addUseMonth());
     dispatch(changeWeekColor());
   };
   const onClickPrevWeek = () => {
+    dispatch(prevMonth());
     dispatch(clickLastMonth());
     dispatch(addUseMonth());
     dispatch(changeWeekColor());
@@ -70,6 +96,7 @@ function useTimeCalendar() {
     onClickPrevWeek,
     onChangeWeek,
     canPickWeek,
+    weekOfDays,
   };
 }
 
@@ -253,6 +280,7 @@ export default function TimeCalendar() {
     onClickPrevWeek,
     onChangeWeek,
     canPickWeek,
+    weekOfDays,
   } = useTimeCalendar();
   return (
     <CalendarWrapper>
@@ -288,20 +316,21 @@ export default function TimeCalendar() {
           <h2>{month.format('YYYY')}</h2>
         </Header>
         <Cal>
-          {weekOfDay.map((week): any => (
-            <DayOfWeek
-              style={
-                week === 'Sa'
-                  ? { color: 'blue' }
-                  : week === 'Su'
-                  ? { color: 'red' }
-                  : { color: 'black' }
-              }
-              key={week}
-            >
-              {week}
-            </DayOfWeek>
-          ))}
+          {weekOfDays &&
+            Object.entries(weekOfDays).map((week: any) => (
+              <DayOfWeek
+                style={
+                  week === 'Sa'
+                    ? { color: 'blue' }
+                    : week === 'Su'
+                    ? { color: 'red' }
+                    : { color: 'black' }
+                }
+                key={week}
+              >
+                {week}
+              </DayOfWeek>
+            ))}
           {teamMonth[month.month() + 1].map((day: any) => (
             <DayBox
               onClick={() => {
