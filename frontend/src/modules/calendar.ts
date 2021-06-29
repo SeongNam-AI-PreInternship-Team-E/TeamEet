@@ -42,7 +42,7 @@ export type TimesState = Times[];
 const initialState: initial = {
   weekOfDay: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
   Days: [],
-  PickDays: {},
+  PickDays: [],
   month: dayjs(),
   title: '',
   start_hour: 0,
