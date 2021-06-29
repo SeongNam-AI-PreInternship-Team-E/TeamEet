@@ -51,6 +51,12 @@ export const individualSlice = createSlice({
     clonePickWeek: (state, action: PayloadAction<any>) => {
       state.canPickWeek = lodash.cloneDeep(action.payload);
     },
+    nextMonth: (state) => {
+      state.month += 1;
+    },
+    prevMonth: (state) => {
+      state.month -= 1;
+    },
     addTimes: (state) => {
       const number = (state.endHour - state.startHour) * 2;
       for (let i = 0; i < 8; i++) {
@@ -150,22 +156,7 @@ export const individualSlice = createSlice({
       }
     },
     addNormalTime: (state) => {
-      for (let i = 1; i < 8; i++) {
-        if (state.PickTime[i].length === 0) {
-          const number = (state.endHour - state.startHour) * 2;
-          for (let j = 0; j <= number; j++) {
-            if (state.PickTime[i]) {
-              state.PickTime[i].push({
-                keyNum: j,
-                time: j,
-                day: 9999,
-                canSee: false,
-                trash: true,
-              });
-            }
-          }
-        }
-      }
+      newFunction(state);
     },
     clickIndividualTime: (
       state,
@@ -397,6 +388,26 @@ export const {
   dragTimes,
   clickIndividualTime,
   setTimeColor,
+  nextMonth,
+  prevMonth,
 } = individualSlice.actions;
 
 export default individualSlice.reducer;
+function newFunction(state: any) {
+  for (let i = 1; i < 8; i++) {
+    if (state.PickTime[i].length === 0) {
+      const number = (state.endHour - state.startHour) * 2;
+      for (let j = 0; j <= number; j++) {
+        if (state.PickTime[i]) {
+          state.PickTime[i].push({
+            keyNum: j,
+            time: j,
+            day: 9999,
+            canSee: false,
+            trash: true,
+          });
+        }
+      }
+    }
+  }
+}
