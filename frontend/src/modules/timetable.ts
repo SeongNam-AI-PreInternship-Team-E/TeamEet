@@ -37,6 +37,7 @@ export type initialTimeTable = {
   PickWeek: any;
   canPickWeek: any;
   canPickMonth: any;
+  showSelect: number;
 };
 
 const initialState: initialTimeTable = {
@@ -57,6 +58,7 @@ const initialState: initialTimeTable = {
     6: false,
   },
   canPickMonth: [],
+  showSelect: 1,
 };
 
 export const timetableSlice = createSlice({
@@ -72,14 +74,44 @@ export const timetableSlice = createSlice({
     },
     clickLastMonth: (state) => {
       state.month = state.month.subtract(1, 'M');
+      state.canPickWeek = {
+        1: false,
+        2: false,
+        3: false,
+        4: false,
+        5: false,
+        6: false,
+      };
     },
     clickNextMonth: (state) => {
       state.month = state.month.add(1, 'M');
+      state.canPickWeek = {
+        1: false,
+        2: false,
+        3: false,
+        4: false,
+        5: false,
+        6: false,
+      };
+    },
+    searchMinWeek: (state) => {
+      if (state.canPickWeek) {
+        for (let i = 6; i >= 1; i--) {
+          if (state.canPickWeek[i]) state.showSelect = i;
+        }
+      }
     },
     canChoosePick: (state) => {
       if (state.PickDays) {
-        Object.entries(state.PickDays).forEach((element: any) => {
-          if (element.length !== 0) state.canPickMonth.push(element[0].month);
+        state.PickDays.forEach((element: any) => {
+          if (element) {
+            if (element.length !== 0) {
+              state.canPickMonth.push({
+                month: element[0].month,
+                keyNum: element[0].month,
+              });
+            }
+          }
         });
       }
     },
@@ -169,6 +201,7 @@ export const timetableSlice = createSlice({
               check.opacity = 0.4;
 
               state.canPickWeek[1] = true;
+              state.showSelect = 1;
             }
           }
         }
@@ -308,6 +341,7 @@ export const {
   clickNextMonth,
   canChoosePick,
   clickWeek,
+  searchMinWeek,
   // clickWeek2,
 } = timetableSlice.actions;
 
