@@ -10,12 +10,14 @@ import rootReducer, { rootSaga } from './modules';
 import createSagaMiddleware from 'redux-saga';
 import { HashRouter } from 'react-router-dom';
 import { composeWithDevTools } from 'redux-devtools-extension'; // 리덕스 개발자 도구
+import { persistStore } from 'redux-persist';
+import { PersistGate } from 'redux-persist/integration/react';
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(
   rootReducer,
   composeWithDevTools(applyMiddleware(sagaMiddleware))
 ); // 스토어를 만듭니다.
-
+const persistor = persistStore(store);
 function loadUser() {
   try {
     const user = localStorage.getItem('user');
@@ -28,9 +30,11 @@ function loadUser() {
 sagaMiddleware.run(rootSaga);
 ReactDOM.render(
   <Provider store={store}>
-    <HashRouter>
-      <App />
-    </HashRouter>
+    <PersistGate loading={true} persistor={persistor}>
+      <HashRouter>
+        <App />
+      </HashRouter>
+    </PersistGate>
   </Provider>,
   document.getElementById('root')
 );
