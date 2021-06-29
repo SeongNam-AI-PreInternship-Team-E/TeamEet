@@ -62,7 +62,6 @@ export const daysSlice = createSlice({
       state.Days = [];
     },
     addDays: (state) => {
-      state.Days.push();
       let i = 1;
       let k = 0;
       const LastMonth = state.month.subtract(1, 'M');
@@ -168,8 +167,8 @@ export const daysSlice = createSlice({
           days.color = '#5465FF';
           days.text_color = 'white';
           const { day, month, key, week } = days;
-
-          state.PickDays[month].push({ day, month, key, week });
+          if (state.PickDays[month])
+            state.PickDays[month].push({ day, month, key, week });
         }
       }
     },
