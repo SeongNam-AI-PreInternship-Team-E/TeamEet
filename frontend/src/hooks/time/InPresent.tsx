@@ -17,7 +17,7 @@ const Name = styled.div<{
   ${(props) =>
     props.canSee // 옆에 클릭 칸들
       ? css`
-          color: white;
+          color: black;
           cursor: pointer;
           text-indent: -10000px;
           &:hover {
