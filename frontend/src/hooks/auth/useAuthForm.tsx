@@ -7,7 +7,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../modules';
 import type { IdPw } from '../../modules/auth';
 import { Link } from 'react-router-dom';
-import { clonePickDays, addUseMonth } from '../../modules/timetable';
+import {
+  clonePickDays,
+  addUseMonth,
+  canChoosePick,
+} from '../../modules/timetable';
 import { cloneDays } from '../../modules/individual';
 interface Props {
   type: string;
@@ -28,6 +32,7 @@ export function useAuthForm() {
     dispatch(clonePickDays(PickDays));
     dispatch(cloneDays(PickDays));
     dispatch(addUseMonth());
+    dispatch(canChoosePick());
   }, [dispatch]);
   const onSubmit = (e: any) => {
     e.preventDefault();

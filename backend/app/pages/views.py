@@ -159,15 +159,23 @@ class SignInView(View):
                 #---------비밀번호 확인--------#
                 if data['password'] == user.password:
                     print('비밀번호 확인 뒤')
+                    dates_info = list(
+                        calendar_dates.objects.filter(private_page_id=page_serializer.data['id']).values())
+                    dates_month_info = [
+                        date['month'] for date in dates_info]
+                    dates_month_info = sorted(list(set(dates_month_info)))
                     #----------토큰 발행----------#
 
                     token = jwt.encode(
                         {'name': data['name'], 'private_page_id': private_page_id}, SECRET_KEY, ALGORITHM)
-
                     #-----------------------------#
 
                     # 토큰을 담아서 응답
-                    return JsonResponse({"token": token}, status=200)
+                    return JsonResponse({"token": token,
+                                        'private_pages': list(private_pages.objects.filter(url=page_serializer.data['url']).values()),
+                                         'calendar_dates': dates_info,
+                                         'month': dates_month_info},
+                                        status=200)
 
             else:
                 return HttpResponse(status=401)
@@ -179,14 +187,14 @@ class SignInView(View):
 
 
 class MemberView(View):
-    @login_decorator
+    @ login_decorator
     def get(self, request):
         print("get-test")
         return JsonResponse({'group_member': list(group_members.objects.values())}, status=200)
 
 
 class RegisterView(View):
-    @login_decorator
+    @ login_decorator
     def post(self, request, url):
         try:
             # 고유 url에 대한 private_pages 튜플 정보 가져옴
@@ -204,7 +212,7 @@ class RegisterView(View):
             'select * from private_pages join calendar_dates on private_pages.id = calendar_dates.private_page_id join group_members on group_members.private_page_id = private_pages.id join available_times on group_members.id = available_times.group_member_id where url=\"'+page_url+'\"')
         print('\n\n\n\\')
         print('*****    joined_page_with_date    ******')
-        print(sql_query_set.query)
+        print(sql_query_set)
         print('\n\n\n\\')
         print("&&& 페이지 정보 조회 $$$")
         for row in sql_query_set:
