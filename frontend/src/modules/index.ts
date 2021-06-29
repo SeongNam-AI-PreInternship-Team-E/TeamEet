@@ -15,7 +15,7 @@ import storageSession from 'redux-persist/lib/storage/session';
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['individual', 'time'],
+  whitelist: ['sample'],
 };
 
 const rootReducer = combineReducers({
