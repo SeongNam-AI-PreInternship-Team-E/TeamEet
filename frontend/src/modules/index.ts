@@ -8,6 +8,16 @@ import auth, { authSaga } from './auth';
 import timetable from './timetable';
 import time from './time';
 import individual from './individual';
+import { persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import storageSession from 'redux-persist/lib/storage/session';
+
+const persistConfig = {
+  key: 'root',
+  storage,
+  whitelist: ['individual', 'time'],
+};
+
 const rootReducer = combineReducers({
   loading,
   sample,
@@ -19,7 +29,7 @@ const rootReducer = combineReducers({
   individual,
 });
 
-export default rootReducer;
+export default persistReducer(persistConfig, rootReducer);
 
 export type RootState = ReturnType<typeof rootReducer>;
 
