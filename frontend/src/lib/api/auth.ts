@@ -1,12 +1,12 @@
 import client from './client';
 import type { IdPw } from '../../modules/auth';
 
-export const register = ({ id, pw }: IdPw) => {
+export const register = ({ id, pw, url }: IdPw) => {
   const user = JSON.stringify({ name: id, password: pw });
-  return client.post('/pages/1-KSgrh/sign-in/', user);
+  return client.post(`/pages/${url}/users/`, user);
 };
 
-export const login = ({ id, pw }: IdPw) => {
+export const login = ({ id, pw, url }: IdPw) => {
   const user = JSON.stringify({ name: id, password: pw });
-  return client.post('/pages/1-KSgrh/users/', user);
+  return client.post(`/pages/${url}/sign-in/`, user);
 };
