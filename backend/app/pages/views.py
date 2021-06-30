@@ -27,14 +27,25 @@ class PagesView(View):
 
     def post(self, request):
         data = json.loads(request.body)
+        if private_pages.objects.filter().exists():
+            page = private_pages.objects.last()
+            # 고유한 url 형식:id-secure_code
+            length_of_string = 5
+            secure_code = ''.join(random.choice(
+                string.ascii_letters) for _ in range(length_of_string))
+            url = str(page.id+1) + '-' + secure_code
+        else:
+            # 고유한 url 형식:id-secure_code
+            length_of_string = 5
+            secure_code = ''.join(random.choice(
+                string.ascii_letters) for _ in range(length_of_string))
+            url = str(1) + '-' + secure_code
 
-        page = private_pages.objects.last()
-
-        # 고유한 url 형식:id-secure_code
-        length_of_string = 5
-        secure_code = ''.join(random.choice(
-            string.ascii_letters) for _ in range(length_of_string))
-        url = str(page.id+1) + '-' + secure_code
+        # # 고유한 url 형식:id-secure_code
+        # length_of_string = 5
+        # secure_code = ''.join(random.choice(
+        #     string.ascii_letters) for _ in range(length_of_string))
+        # url = str(page.id+1) + '-' + secure_code
 
         private_pages.objects.create(
             url=url, title=data['title'], min_time=data['min_time'], max_time=data['max_time'])
@@ -229,6 +240,5 @@ class RegisterView(View):
             print(', '.join(
                 ['{}: {}'.format(field, getattr(row, field))
                   for field in ['id', 'month', 'day', 'name', 'time']]
-                # for field in ['p.url', 'd.year', 'd.month', 'd.day', 'd.day_of_week', 'm.name', 't.time']]
             ))
         return HttpResponse('successfully register')
