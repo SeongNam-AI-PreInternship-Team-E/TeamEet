@@ -7,6 +7,7 @@ type Props = {};
 const App = (props: Props) => {
   return (
     <>
+      {console.log(fetch)}
       <Route component={CalendarPage} path="/" exact />
       <Route component={AuthPage} path="/register" />
       <Route component={LoginPage} path="/login" />
