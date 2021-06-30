@@ -1,3 +1,4 @@
+from django.db.models.expressions import Exists
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework.serializers import SerializerMetaclass
@@ -102,7 +103,8 @@ def pages_users(request, url):
         group_members.objects.filter(private_page_id=private_page_id, id=recent_member.data['id']).update(
             name=data['name'], password=data['password'])
 
-        return HttpResponse('Successfully signed up')
+        # return HttpResponse('Successfully signed up')
+        return JsonResponse({'signed_up_group_member': recent_member.data['id']}, status=200)
 
 
 # @csrf_exempt
@@ -127,7 +129,7 @@ def dates(request):
         calendar_dates.objects.filter(private_page_id=private_page_id, id=id).update(
             year=data['year'], month=data['month'], day=data['day'], day_of_week=data['day_of_week'])
 
-        return HttpResponse(status=200)
+        return JsonResponse({'private_pages': list(private_pages.objects.filter(id=private_page_id).values()), 'calendar_dates': list(calendar_dates.objects.filter(private_page_id=private_page_id).values())})
 
 
 # @login_decorator
@@ -159,15 +161,24 @@ class SignInView(View):
                 #---------비밀번호 확인--------#
                 if data['password'] == user.password:
                     print('비밀번호 확인 뒤')
+                    dates_info = list(
+                        calendar_dates.objects.filter(private_page_id=page_serializer.data['id']).values())
+                    dates_month_info = [
+                        date['month'] for date in dates_info]
+                    dates_month_info = sorted(list(set(dates_month_info)))
                     #----------토큰 발행----------#
 
                     token = jwt.encode(
                         {'name': data['name'], 'private_page_id': private_page_id}, SECRET_KEY, ALGORITHM)
-
                     #-----------------------------#
 
                     # 토큰을 담아서 응답
-                    return JsonResponse({"token": token}, status=200)
+                    return JsonResponse({"token": token,
+                                        'private_pages': list(private_pages.objects.filter(url=page_serializer.data['url']).values()),
+                                         'calendar_dates': dates_info,
+                                         'month': dates_month_info,
+                                         'sigined_in_group_member_id': user.id},
+                                        status=200)
 
             else:
                 return HttpResponse(status=401)
@@ -179,14 +190,14 @@ class SignInView(View):
 
 
 class MemberView(View):
-    @login_decorator
+    @ login_decorator
     def get(self, request):
         print("get-test")
         return JsonResponse({'group_member': list(group_members.objects.values())}, status=200)
 
 
 class RegisterView(View):
-    @login_decorator
+    @ login_decorator
     def post(self, request, url):
         try:
             # 고유 url에 대한 private_pages 튜플 정보 가져옴
@@ -197,6 +208,32 @@ class RegisterView(View):
         # url, year, month, day, day_of_week, name, start/end_time
         data = json.loads(request.body)
         page_serializer = GetPagesSerializer(page)
+        access_token = request.headers.get('Authorization', None)
+        payload = jwt.decode(access_token, SECRET_KEY, ALGORITHM)
+        user = group_members.objects.filter(
+            private_page_id=payload['private_page_id'], name=payload['name'])
+        for logined_user in user:
+            user_id = logined_user.id
+
+            #일정표에서 일자별로 선택된 시간대(time) DB에 저장하기#
+        # request에서 key 중 값들을 또 다른 객체들로 받는 "calendar_dates"로 value값 확인 -> 각 객체는 "year","month","day","time"이라는 키들을 가짐.
+        for dates in data['calendar_dates']:
+            # 특정 페이지 내부에 request에서 받아온 일자에 해당하는 키의 값이 존재하는지 확인
+            if calendar_dates.objects.filter(
+                    private_page_id=page_serializer.data['id'], year=dates['year'], month=dates['month'], day=dates['day']).exists():
+                # 일자 까지 조회
+                calendar_date = calendar_dates.objects.filter(
+                    private_page_id=page_serializer.data['id'], year=dates['year'], month=dates['month'], day=dates['day'])
+
+                # calendar_date가 쿼리셋이기 때문에 해당 쿼리셋의 calendar_dates의 id 값을 추출하기 위한 for문
+                for date in calendar_date:
+                    date_id = date.id
+                    print(date_id)
+                    # available_times.objects.create(
+                    #     group_member_id=user_id, calendar_date_id=date_id, time=dates['time'])
+            else:
+                return HttpResponse('calendar_dates is empty')
+
         print('\n\n\n\\')
         page_url = page_serializer.data['url']
         print('\n\n\n\\')
@@ -204,14 +241,16 @@ class RegisterView(View):
             'select * from private_pages join calendar_dates on private_pages.id = calendar_dates.private_page_id join group_members on group_members.private_page_id = private_pages.id join available_times on group_members.id = available_times.group_member_id where url=\"'+page_url+'\"')
         print('\n\n\n\\')
         print('*****    joined_page_with_date    ******')
-        print(sql_query_set.query)
+
+        print(sql_query_set)
+
         print('\n\n\n\\')
         print("&&& 페이지 정보 조회 $$$")
         for row in sql_query_set:
-            print(', '.join(
-                ['{}: {}'.format(field, getattr(row, field))
-                  for field in ['url', 'year', 'month', 'day', 'day_of_week', 'name', 'time']]
-                # for field in ['p.url', 'd.year', 'd.month', 'd.day', 'd.day_of_week', 'm.name', 't.time']]
-            ))
-
+            print(row)
+            # print(', '.join(
+            #     ['{}: {}'.format(field, getattr(row, field))
+            #       for field in ['id', 'url', 'calendar_date_id', 'year', 'month', 'day', 'day_of_week', 'group_member_id', 'name', 'time']]
+            #     # for field in ['p.url', 'd.year', 'd.month', 'd.day', 'd.day_of_week', 'm.name', 't.time']]
+            # ))
         return HttpResponse('successfully register')

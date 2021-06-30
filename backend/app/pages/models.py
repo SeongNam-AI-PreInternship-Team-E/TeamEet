@@ -45,6 +45,8 @@ class group_members(models.Model):
 
 class available_times(models.Model):
     time = models.CharField(max_length=20)
+    calendar_date = models.ForeignKey(
+        calendar_dates, on_delete=models.CASCADE)
     group_member = models.ForeignKey(
         group_members, on_delete=models.CASCADE, related_name='available_time')
 
