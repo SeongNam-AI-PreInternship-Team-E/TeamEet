@@ -26,6 +26,7 @@ import {
   prevMonth,
   setTimeColor,
   clickIndividualMonth,
+  clonePresentWeek,
 } from '../../modules/individual';
 import { setInitialDate } from '../../modules/calendar';
 
@@ -39,6 +40,7 @@ function useTimeCalendar() {
     PickDays,
     canPickMonth,
     showSelect,
+    presentWeek,
   } = useSelector((state: RootState) => ({
     teamMonth: state.timetable.teamMonth,
     month: state.timetable.month,
@@ -48,6 +50,7 @@ function useTimeCalendar() {
     PickDays: state.calendar.PickDays,
     canPickMonth: state.timetable.canPickMonth,
     showSelect: state.timetable.showSelect,
+    presentWeek: state.timetable.presentWeek,
   }));
   const dispatch = useDispatch();
   // const [useMonth, onChangeUseMonth] = useState(canPickMonth[0].month);
@@ -63,9 +66,10 @@ function useTimeCalendar() {
     dispatch(addTimes());
     dispatch(addNormalTime());
     dispatch(setTimeColor());
+    dispatch(clonePresentWeek(presentWeek));
     // dispatch(clickWeek(showSelect));
     // dispatch(clickWeek(presentWeek));
-  }, [dispatch, PickWeek]);
+  }, [dispatch, PickWeek, presentWeek]);
   useEffect(() => {
     dispatch(changeWeekColor());
     dispatch(searchMinWeek());
@@ -99,6 +103,7 @@ function useTimeCalendar() {
   };
   const onClickWeek = (week: number) => {
     dispatch(clickMonth(week));
+    dispatch(clonePresentWeek(week));
     dispatch(clickIndividualMonth(week));
     dispatch(searchMinWeek());
     dispatch(addUseMonth());
