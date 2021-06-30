@@ -57,6 +57,9 @@ export const individualSlice = createSlice({
     prevMonth: (state) => {
       state.month -= 1;
     },
+    clickIndividualMonth: (state, action: PayloadAction<any>) => {
+      state.month = action.payload;
+    },
     addTimes: (state) => {
       const number = (state.endHour - state.startHour) * 2;
       for (let i = 0; i < 8; i++) {
@@ -390,6 +393,7 @@ export const {
   setTimeColor,
   nextMonth,
   prevMonth,
+  clickIndividualMonth,
 } = individualSlice.actions;
 
 export default individualSlice.reducer;

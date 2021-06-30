@@ -239,6 +239,27 @@ export const timetableSlice = createSlice({
         }
       }
     },
+    clickMonth: (state, action: PayloadAction<number>) => {
+      let myMonth = action.payload;
+      let sysMonth = state.month.month() + 1;
+      let count = myMonth - sysMonth; // 현재 시간에서 시스템 달 빼기
+      state.canPickWeek = {
+        1: false,
+        2: false,
+        3: false,
+        4: false,
+        5: false,
+        6: false,
+      };
+      if (count > 0) {
+        state.month = state.month.add(count, 'M');
+      } else if (count < 0) {
+        count *= -1;
+        state.month = state.month.subtract(count, 'M');
+      } else {
+        return;
+      }
+    },
     addUseMonth: (state, action: PayloadAction) => {
       let i = 1;
       let k = 0;
@@ -342,6 +363,7 @@ export const {
   canChoosePick,
   clickWeek,
   searchMinWeek,
+  clickMonth,
   // clickWeek2,
 } = timetableSlice.actions;
 
