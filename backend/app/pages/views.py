@@ -120,15 +120,15 @@ def dates(request):
         # 제일 최근에 생성한 private_page 튜플 id값을 연관된 page로 인식한다고 가정
         private_page_id = private_pages.objects.all().count()
 
-        calendar_dates.objects.create(
-            private_page_id=private_page_id)
+        # calendar_dates.objects.create(
+        #     private_page_id=private_page_id)
 
         id = calendar_dates.objects.all().count()
 
-        calendar_dates.objects.filter(private_page_id=private_page_id, id=id).update(
-            year=data['year'], month=data['month'], day=data['day'], day_of_week=data['day_of_week'])
+        # calendar_dates.objects.filter(private_page_id=private_page_id, id=id).update(
+        #     year=data['year'], month=data['month'], day=data['day'], day_of_week=data['day_of_week'])
 
-        return HttpResponse(status=200)
+        return JsonResponse({'private_pages': list(private_pages.objects.filter(id=private_page_id).values()), 'calendar_dates': list(calendar_dates.objects.filter(private_page_id=private_page_id).values())})
 
 
 # @login_decorator
@@ -227,8 +227,8 @@ class RegisterView(View):
                 for date in calendar_date:
                     date_id = date.id
                     print(date_id)
-                    available_times.objects.create(
-                        group_member_id=user_id, calendar_date_id=date_id, time=dates['time'])
+                    # available_times.objects.create(
+                    #     group_member_id=user_id, calendar_date_id=date_id, time=dates['time'])
             else:
                 return HttpResponse('calendar_dates is empty')
 
@@ -245,9 +245,10 @@ class RegisterView(View):
         print('\n\n\n\\')
         print("&&& 페이지 정보 조회 $$$")
         for row in sql_query_set:
-            print(', '.join(
-                ['{}: {}'.format(field, getattr(row, field))
-                  for field in ['url', 'year', 'month', 'day', 'day_of_week', 'name', 'time']]
-                # for field in ['p.url', 'd.year', 'd.month', 'd.day', 'd.day_of_week', 'm.name', 't.time']]
-            ))
+            print(row)
+            # print(', '.join(
+            #     ['{}: {}'.format(field, getattr(row, field))
+            #       for field in ['id', 'url', 'calendar_date_id', 'year', 'month', 'day', 'day_of_week', 'group_member_id', 'name', 'time']]
+            #     # for field in ['p.url', 'd.year', 'd.month', 'd.day', 'd.day_of_week', 'm.name', 't.time']]
+            # ))
         return HttpResponse('successfully register')
