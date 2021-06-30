@@ -1,3 +1,4 @@
+from django.db.models.expressions import Exists
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework.serializers import SerializerMetaclass
@@ -119,15 +120,15 @@ def dates(request):
         # 제일 최근에 생성한 private_page 튜플 id값을 연관된 page로 인식한다고 가정
         private_page_id = private_pages.objects.all().count()
 
-        calendar_dates.objects.create(
-            private_page_id=private_page_id)
+        # calendar_dates.objects.create(
+        #     private_page_id=private_page_id)
 
         id = calendar_dates.objects.all().count()
 
-        calendar_dates.objects.filter(private_page_id=private_page_id, id=id).update(
-            year=data['year'], month=data['month'], day=data['day'], day_of_week=data['day_of_week'])
+        # calendar_dates.objects.filter(private_page_id=private_page_id, id=id).update(
+        #     year=data['year'], month=data['month'], day=data['day'], day_of_week=data['day_of_week'])
 
-        return HttpResponse(status=200)
+        return JsonResponse({'private_pages': list(private_pages.objects.filter(id=private_page_id).values()), 'calendar_dates': list(calendar_dates.objects.filter(private_page_id=private_page_id).values())})
 
 
 # @login_decorator
@@ -205,6 +206,32 @@ class RegisterView(View):
         # url, year, month, day, day_of_week, name, start/end_time
         data = json.loads(request.body)
         page_serializer = GetPagesSerializer(page)
+        access_token = request.headers.get('Authorization', None)
+        payload = jwt.decode(access_token, SECRET_KEY, ALGORITHM)
+        user = group_members.objects.filter(
+            private_page_id=payload['private_page_id'], name=payload['name'])
+        for logined_user in user:
+            user_id = logined_user.id
+
+            #일정표에서 일자별로 선택된 시간대(time) DB에 저장하기#
+        # request에서 key 중 값들을 또 다른 객체들로 받는 "calendar_dates"로 value값 확인 -> 각 객체는 "year","month","day","time"이라는 키들을 가짐.
+        for dates in data['calendar_dates']:
+            # 특정 페이지 내부에 request에서 받아온 일자에 해당하는 키의 값이 존재하는지 확인
+            if calendar_dates.objects.filter(
+                    private_page_id=page_serializer.data['id'], year=dates['year'], month=dates['month'], day=dates['day']).exists():
+                # 일자 까지 조회
+                calendar_date = calendar_dates.objects.filter(
+                    private_page_id=page_serializer.data['id'], year=dates['year'], month=dates['month'], day=dates['day'])
+
+                # calendar_date가 쿼리셋이기 때문에 해당 쿼리셋의 calendar_dates의 id 값을 추출하기 위한 for문
+                for date in calendar_date:
+                    date_id = date.id
+                    print(date_id)
+                    # available_times.objects.create(
+                    #     group_member_id=user_id, calendar_date_id=date_id, time=dates['time'])
+            else:
+                return HttpResponse('calendar_dates is empty')
+
         print('\n\n\n\\')
         page_url = page_serializer.data['url']
         print('\n\n\n\\')
@@ -212,14 +239,16 @@ class RegisterView(View):
             'select * from private_pages join calendar_dates on private_pages.id = calendar_dates.private_page_id join group_members on group_members.private_page_id = private_pages.id join available_times on group_members.id = available_times.group_member_id where url=\"'+page_url+'\"')
         print('\n\n\n\\')
         print('*****    joined_page_with_date    ******')
+
         print(sql_query_set)
+
         print('\n\n\n\\')
         print("&&& 페이지 정보 조회 $$$")
         for row in sql_query_set:
-            print(', '.join(
-                ['{}: {}'.format(field, getattr(row, field))
-                  for field in ['url', 'year', 'month', 'day', 'day_of_week', 'name', 'time']]
-                # for field in ['p.url', 'd.year', 'd.month', 'd.day', 'd.day_of_week', 'm.name', 't.time']]
-            ))
-
+            print(row)
+            # print(', '.join(
+            #     ['{}: {}'.format(field, getattr(row, field))
+            #       for field in ['id', 'url', 'calendar_date_id', 'year', 'month', 'day', 'day_of_week', 'group_member_id', 'name', 'time']]
+            #     # for field in ['p.url', 'd.year', 'd.month', 'd.day', 'd.day_of_week', 'm.name', 't.time']]
+            # ))
         return HttpResponse('successfully register')
