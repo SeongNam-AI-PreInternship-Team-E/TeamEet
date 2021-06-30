@@ -1,5 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
+from rest_framework.serializers import SerializerMetaclass
 from .models import *
 from .serializers import *
 from django.views.decorators.csrf import csrf_exempt
@@ -196,29 +197,21 @@ class RegisterView(View):
         # url, year, month, day, day_of_week, name, start/end_time
         data = json.loads(request.body)
         page_serializer = GetPagesSerializer(page)
-        private_page = private_pages.objects.get(
-            url=page_serializer.data['url'])
-        joined_page = private_pages.objects.select_related()
-        # joined_everything = private_pages.objects.get(
-        #    url=page_serializer.data['url'])
-        join = private_pages.objects.get(
-            url=page_serializer.data['url']).members.get()
-
+        print('\n\n\n\\')
+        page_url = page_serializer.data['url']
+        print('\n\n\n\\')
+        sql_query_set = private_pages.objects.raw(
+            'select * from private_pages join calendar_dates on private_pages.id = calendar_dates.private_page_id join group_members on group_members.private_page_id = private_pages.id join available_times on group_members.id = available_times.group_member_id where url=\"'+page_url+'\"')
         print('\n\n\n\\')
         print('*****    joined_page_with_date    ******')
-        print(private_page)
+        print(sql_query_set.query)
         print('\n\n\n\\')
-        print("private type:    ", type(private_page))
-        # print("private.query type:    ", type(private_page.query))
-        print('joined_page type: ', type(joined_page))
-        print('join type: ', type(join))
-        print('\n\n\n\\')
+        print("&&& 페이지 정보 조회 $$$")
+        for row in sql_query_set:
+            print(', '.join(
+                ['{}: {}'.format(field, getattr(row, field))
+                  for field in ['url', 'year', 'month', 'day', 'day_of_week', 'name', 'time']]
+                # for field in ['p.url', 'd.year', 'd.month', 'd.day', 'd.day_of_week', 'm.name', 't.time']]
+            ))
 
-        print('\n\n\n\\')
-        print('*****    data    ******')
-        print(data)
-        print('\n\n\n\\')
-        print('*****    page.data    ******')
-        print(page_serializer)
-        print('\n\n\n\\')
         return HttpResponse('successfully register')
