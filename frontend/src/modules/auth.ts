@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import createRequestSaga from '../hooks/createRequestSaga';
-import * as api from '../lib/api';
+import * as api from '../lib/api/auth';
 import { takeLatest } from 'redux-saga/effects';
 import { createAction } from 'redux-actions';
 
@@ -9,8 +9,8 @@ export type User = {
   pw: string;
   register: { id: string; pw: string };
   form: string;
-  auth: null;
-  authError: null;
+  auth: [];
+  authError: [];
 };
 
 type LoginOrPassword = {
@@ -27,8 +27,10 @@ const REGISTER = 'auth/REGISTER';
 const LOGIN = 'auth/LOGIN';
 export const register = createAction(REGISTER, (user: IdPw) => user);
 export const login = createAction(LOGIN, (user: IdPw) => user);
-const registerSaga = createRequestSaga(register, api.getPost);
-const loginSaga = createRequestSaga(login, api.getPost);
+
+const registerSaga = createRequestSaga(register, api.register);
+const loginSaga = createRequestSaga(login, api.login);
+
 export function* authSaga() {
   yield takeLatest(REGISTER, registerSaga);
   yield takeLatest(LOGIN, loginSaga);
@@ -43,8 +45,8 @@ const initialState: User = {
     id: '',
     pw: '',
   },
-  auth: null,
-  authError: null,
+  auth: [],
+  authError: [],
 };
 
 export const authSlice = createSlice({
@@ -62,20 +64,29 @@ export const authSlice = createSlice({
         id: '',
         pw: '',
       };
-      state.auth = null;
-      state.authError = null;
+      state.auth = [];
+      state.authError = [];
     },
     REGISTER_SUCCESS: (state, action: PayloadAction<any>) => {
       state.auth = action.payload;
-      state.authError = null;
+      state.authError = [];
     },
     REGISTER_FAILURE: (state, action: PayloadAction<any>) => {
-      state.authError = action.payload.message;
-      state.auth = null;
+      state.authError = action.payload;
+      state.auth = [];
+    },
+    LOGIN_SUCCESS: (state, action: PayloadAction<any>) => {
+      state.auth = action.payload;
+      state.authError = [];
+    },
+    LOGIN_FAILURE: (state, action: PayloadAction<any>) => {
+      state.authError = action.payload;
+      state.auth = [];
     },
   },
 });
 
-export const { changeField, initialForm } = authSlice.actions;
+export const { changeField, initialForm, LOGIN_SUCCESS, REGISTER_SUCCESS } =
+  authSlice.actions;
 
 export default authSlice.reducer;

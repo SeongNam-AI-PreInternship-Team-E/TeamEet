@@ -4,7 +4,11 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import dayjs from 'dayjs';
-
+import { createAction } from 'redux-actions';
+import createRequestSaga from '../hooks/createRequestSaga';
+import * as api from '../lib/api/admin';
+import { takeLatest } from 'redux-saga/effects';
+import { date } from 'fp-ts';
 export type Days = {
   day: number;
   present: boolean;
@@ -20,6 +24,19 @@ export type PickDay = {
   day: number;
 };
 
+export type Page = {
+  title: string;
+  min_time: number;
+  max_time: number;
+};
+
+export type Date = {
+  year: number;
+  month: number;
+  day: number;
+  day_of_week: string;
+};
+
 type initial = {
   weekOfDay: any[];
   Days: Days[];
@@ -30,6 +47,8 @@ type initial = {
   title: string;
   pickArr: number[];
   teamMonth: any;
+  page: Page;
+  Dates: Date[];
 };
 export type Times = {
   start_hour: string;
@@ -38,6 +57,20 @@ export type Times = {
 
 export type DaysState = Days[];
 export type TimesState = Times[];
+
+const PAGE = 'calendar/PAGE';
+const DATES = 'calendar/DATES';
+
+export const submitPageInfo = createAction(PAGE, (page: Page) => page);
+export const submitDatesInfo = createAction(DATES, (date: Date) => date);
+
+const pageSaga = createRequestSaga(PAGE, api.sendPage);
+const dateSaga = createRequestSaga(DATES, api.sendDates);
+
+export function* calendarSaga() {
+  yield takeLatest(PAGE, pageSaga);
+  yield takeLatest(DATES, dateSaga);
+}
 
 const initialState: initial = {
   weekOfDay: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
@@ -49,12 +82,24 @@ const initialState: initial = {
   end_hour: 0,
   pickArr: [],
   teamMonth: {},
+  page: {
+    title: '',
+    max_time: 9,
+    min_time: 12,
+  },
+  Dates: [],
 };
 
 export const daysSlice = createSlice({
-  name: 'DAYS',
+  name: 'days',
   initialState,
   reducers: {
+    PAGE_SUCCESS: (state, action: PayloadAction<any>) => {
+      state.page = action.payload;
+    },
+    DATES_SUCCESS: (state, action: PayloadAction<any>) => {
+      state.Dates = action.payload;
+    },
     setDay: (state, action: PayloadAction<any>) => {
       state.month = action.payload;
     },

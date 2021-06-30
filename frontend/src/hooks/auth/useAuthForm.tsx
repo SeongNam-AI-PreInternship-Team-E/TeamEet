@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../modules';
 import type { IdPw } from '../../modules/auth';
 import { Link } from 'react-router-dom';
+
 import {
   clonePickDays,
   addUseMonth,
@@ -146,16 +147,8 @@ export default function AuthForm({ type }: Props) {
             </LoginOrRegister>
           )}
         </LoginOrRegister>
-        {type === 'register' && (
-          <Button middleWidth to="/timetable">
-            회원가입
-          </Button>
-        )}
-        {type === 'login' && (
-          <Button middleWidth to="/timetable">
-            로그인
-          </Button>
-        )}
+        {type === 'register' && <Button middleWidth>회원가입</Button>}
+        {type === 'login' && <Button middleWidth>로그인</Button>}
       </form>
 
       <Footer>
