@@ -103,7 +103,8 @@ def pages_users(request, url):
         group_members.objects.filter(private_page_id=private_page_id, id=recent_member.data['id']).update(
             name=data['name'], password=data['password'])
 
-        return HttpResponse('Successfully signed up')
+        # return HttpResponse('Successfully signed up')
+        return JsonResponse({'signed_up_group_member': recent_member.data['id']}, status=200)
 
 
 # @csrf_exempt
@@ -175,7 +176,8 @@ class SignInView(View):
                     return JsonResponse({"token": token,
                                         'private_pages': list(private_pages.objects.filter(url=page_serializer.data['url']).values()),
                                          'calendar_dates': dates_info,
-                                         'month': dates_month_info},
+                                         'month': dates_month_info,
+                                         'sigined_in_group_member_id': user.id},
                                         status=200)
 
             else:
