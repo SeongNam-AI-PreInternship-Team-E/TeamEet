@@ -11,6 +11,7 @@ import {
   canChoosePick,
   changeWeekColor,
   clickLastMonth,
+  clickMonth,
   clickNextMonth,
   clickWeek,
   clonePickDays,
@@ -24,6 +25,7 @@ import {
   nextMonth,
   prevMonth,
   setTimeColor,
+  clickIndividualMonth,
 } from '../../modules/individual';
 import { setInitialDate } from '../../modules/calendar';
 
@@ -95,7 +97,15 @@ function useTimeCalendar() {
     dispatch(addTimes());
     dispatch(addNormalTime());
   };
-
+  const onClickWeek = (week: number) => {
+    dispatch(clickMonth(week));
+    dispatch(clickIndividualMonth(week));
+    dispatch(searchMinWeek());
+    dispatch(addUseMonth());
+    dispatch(changeWeekColor());
+    dispatch(clickWeek(showSelect));
+    dispatch(setTimeColor());
+  };
   return {
     teamMonth,
     month,
@@ -104,7 +114,7 @@ function useTimeCalendar() {
     onClickPrevWeek,
     onChangeWeek,
     canPickWeek,
-
+    onClickWeek,
     canPickMonth,
   };
 }
@@ -229,6 +239,16 @@ const Cal = styled.div`
   }
 `;
 
+const Month = styled.div`
+  cursor: pointer;
+  width: 10%;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+`;
+
 const DayOfWeek = styled.div`
   font-size: 1.2rem;
   display: flex;
@@ -289,7 +309,7 @@ export default function TimeCalendar() {
     onClickPrevWeek,
     onChangeWeek,
     canPickWeek,
-
+    onClickWeek,
     canPickMonth,
   } = useTimeCalendar();
   return (
@@ -324,7 +344,15 @@ export default function TimeCalendar() {
             style={{ cursor: 'pointer' }}
           ></AiFillCaretRight>
           {canPickMonth.map((month: any) => (
-            <h2 key={month.month}>{month.month}</h2>
+            <Month
+              onClick={() => {
+                onClickWeek(month.month);
+              }}
+              style={{ cursor: 'pointer' }}
+              key={month.month}
+            >
+              {month.month}
+            </Month>
           ))}
         </Header>
         <Cal>
