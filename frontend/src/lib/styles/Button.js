@@ -25,9 +25,10 @@ const buttonStyle = css`
       font-size: 1.125rem;
     `}
   ${(props) =>
-    props.middleWidth &&
+    props.middlewidth &&
     css`
-      display: block;
+      display: flex;
+      justify-content: center;
       margin: auto;
       padding-top: 0.75rem;
       padding-bottom: 0.75rem;
