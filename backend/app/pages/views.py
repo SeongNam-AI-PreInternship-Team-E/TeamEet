@@ -103,7 +103,8 @@ def pages_users(request, url):
         group_members.objects.filter(private_page_id=private_page_id, id=recent_member.data['id']).update(
             name=data['name'], password=data['password'])
 
-        return HttpResponse('Successfully signed up')
+        # return HttpResponse('Successfully signed up')
+        return JsonResponse({'signed_up_group_member': recent_member.data['id']}, status=200)
 
 
 # @csrf_exempt
@@ -128,7 +129,7 @@ def dates(request):
         calendar_dates.objects.filter(private_page_id=private_page_id, id=id).update(
             year=data['year'], month=data['month'], day=data['day'], day_of_week=data['day_of_week'])
 
-        return HttpResponse(status=200)
+        return JsonResponse({'private_pages': list(private_pages.objects.filter(id=private_page_id).values()), 'calendar_dates': list(calendar_dates.objects.filter(private_page_id=private_page_id).values())})
 
 
 # @login_decorator
@@ -175,7 +176,8 @@ class SignInView(View):
                     return JsonResponse({"token": token,
                                         'private_pages': list(private_pages.objects.filter(url=page_serializer.data['url']).values()),
                                          'calendar_dates': dates_info,
-                                         'month': dates_month_info},
+                                         'month': dates_month_info,
+                                         'sigined_in_group_member_id': user.id},
                                         status=200)
 
             else:
@@ -227,8 +229,8 @@ class RegisterView(View):
                 for date in calendar_date:
                     date_id = date.id
                     print(date_id)
-                    available_times.objects.create(
-                        group_member_id=user_id, calendar_date_id=date_id, time=dates['time'])
+                    # available_times.objects.create(
+                    #     group_member_id=user_id, calendar_date_id=date_id, time=dates['time'])
             else:
                 return HttpResponse('calendar_dates is empty')
 
@@ -245,9 +247,10 @@ class RegisterView(View):
         print('\n\n\n\\')
         print("&&& 페이지 정보 조회 $$$")
         for row in sql_query_set:
-            print(', '.join(
-                ['{}: {}'.format(field, getattr(row, field))
-                  for field in ['url', 'year', 'month', 'day', 'day_of_week', 'name', 'time']]
-                # for field in ['p.url', 'd.year', 'd.month', 'd.day', 'd.day_of_week', 'm.name', 't.time']]
-            ))
+            print(row)
+            # print(', '.join(
+            #     ['{}: {}'.format(field, getattr(row, field))
+            #       for field in ['id', 'url', 'calendar_date_id', 'year', 'month', 'day', 'day_of_week', 'group_member_id', 'name', 'time']]
+            #     # for field in ['p.url', 'd.year', 'd.month', 'd.day', 'd.day_of_week', 'm.name', 't.time']]
+            # ))
         return HttpResponse('successfully register')
