@@ -19,12 +19,16 @@ interface Props {
 }
 
 export function useAuthForm() {
-  const { id, pw, form, PickDays } = useSelector((state: RootState) => ({
-    id: state.auth.id,
-    pw: state.auth.pw,
-    form: state.auth.form,
-    PickDays: state.calendar.PickDays,
-  }));
+  const { id, pw, form, PickDays, response, url } = useSelector(
+    (state: RootState) => ({
+      id: state.auth.id,
+      pw: state.auth.pw,
+      form: state.auth.form,
+      PickDays: state.calendar.PickDays,
+      response: state.calendar.response,
+      url: state.calendar.url,
+    })
+  );
   const dispatch = useDispatch();
   const [check, onChangeCheck] = useState(false);
   useEffect(() => {
@@ -40,6 +44,7 @@ export function useAuthForm() {
     const user: IdPw = {
       id: id,
       pw: pw,
+      url: url,
     };
     check && dispatch(register(user));
     !check && dispatch(login(user));
@@ -48,7 +53,7 @@ export function useAuthForm() {
     const { value, name } = e.target;
     dispatch(changeField({ key: name, value: value }));
   };
-  return { onChange, id, pw, onSubmit, onChangeCheck };
+  return { onChange, id, pw, onSubmit, onChangeCheck, response };
 }
 
 const AuthFormBlock = styled.div`
@@ -109,7 +114,7 @@ const Footer = styled.div`
 `;
 
 export default function AuthForm({ type }: Props) {
-  const { onChange, id, pw, onSubmit, onChangeCheck } = useAuthForm();
+  const { onChange, id, pw, onSubmit, onChangeCheck, response } = useAuthForm();
   useEffect(() => {
     if (type === 'register') {
       onChangeCheck(true);
@@ -119,6 +124,8 @@ export default function AuthForm({ type }: Props) {
   }, [type]);
   return (
     <AuthFormBlock>
+      {response.private_pages &&
+        console.log('url', response.private_pages[0].url)}
       <form onSubmit={onSubmit}>
         <StyledInput
           autoComplete="username"
@@ -147,8 +154,16 @@ export default function AuthForm({ type }: Props) {
             </LoginOrRegister>
           )}
         </LoginOrRegister>
-        {type === 'register' && <Button middleWidth>회원가입</Button>}
-        {type === 'login' && <Button middleWidth>로그인</Button>}
+        {type === 'register' && (
+          <Button middlewidth="true" to="/timetable">
+            회원가입
+          </Button>
+        )}
+        {type === 'login' && (
+          <Button middewidth="true" to="/timetable">
+            로그인
+          </Button>
+        )}
       </form>
 
       <Footer>

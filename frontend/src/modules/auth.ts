@@ -7,10 +7,11 @@ import { createAction } from 'redux-actions';
 export type User = {
   id: string;
   pw: string;
-  register: { id: string; pw: string };
+  register: { id: string; pw: string; url: string };
   form: string;
   auth: [];
   authError: [];
+  url: string;
 };
 
 type LoginOrPassword = {
@@ -21,6 +22,7 @@ type LoginOrPassword = {
 export type IdPw = {
   id: string;
   pw: string;
+  url: string;
 };
 
 const REGISTER = 'auth/REGISTER';
@@ -39,11 +41,12 @@ export function* authSaga() {
 const initialState: User = {
   id: '',
   pw: '',
-
+  url: '',
   form: 'register',
   register: {
     id: '',
     pw: '',
+    url: '',
   },
   auth: [],
   authError: [],
@@ -60,9 +63,11 @@ export const authSlice = createSlice({
     initialForm: (state) => {
       state.id = '';
       state.pw = '';
+      state.url = '';
       state.register = {
         id: '',
         pw: '',
+        url: '',
       };
       state.auth = [];
       state.authError = [];

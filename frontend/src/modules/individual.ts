@@ -18,6 +18,13 @@ type initial = {
   change: changeDay;
 };
 
+type sendWeek = {
+  year: number;
+  month: number;
+  day: number;
+  time: number;
+};
+
 const initialState: initial = {
   PickWeek: [],
   PickTime: [],
@@ -25,7 +32,7 @@ const initialState: initial = {
   IndividualTime: [],
   startHour: 10,
   endHour: 20,
-  month: 6,
+  month: 7,
   presentWeek: 1,
   canPickWeek: {},
   change: { check: false, day: 0 },
@@ -160,6 +167,9 @@ export const individualSlice = createSlice({
     },
     addNormalTime: (state) => {
       newFunction(state);
+    },
+    clonePresentWeek: (state, action: PayloadAction<number>) => {
+      state.presentWeek = action.payload;
     },
     clickIndividualTime: (
       state,
@@ -394,6 +404,7 @@ export const {
   nextMonth,
   prevMonth,
   clickIndividualMonth,
+  clonePresentWeek,
 } = individualSlice.actions;
 
 export default individualSlice.reducer;

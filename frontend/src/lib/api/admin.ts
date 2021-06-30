@@ -1,20 +1,12 @@
 import client from './client';
-
-export const sendPage = ({ title, min_time, max_time }: any) => {
-  const info = JSON.stringify({
-    title: title,
-    min_time: min_time,
-    max_time: max_time,
-  });
-  return client.post('/pages/', info);
-};
-
-export const sendDates = ({ year, month, day, day_of_week }: any) => {
+import type { Info } from '../../modules/calendar';
+export const sendPage = (info: Info) => {
   const dayInfo = JSON.stringify({
-    year: year,
-    month: month,
-    day: day,
-    day_of_week: day_of_week,
+    title: info.page.title,
+    max_time: info.page.max_time,
+    min_time: info.page.min_time,
+    calendar_dates: info.solve,
   });
-  return client.post('/dates/', dayInfo);
+  console.log('data is ', info.solve);
+  return client.post('/pages/', dayInfo);
 };

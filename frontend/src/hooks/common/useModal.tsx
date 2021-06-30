@@ -7,12 +7,21 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../modules';
 import { setEnd, setStart } from '../../modules/individual';
 import { useDispatch } from 'react-redux';
+import {
+  addUseDaysCal,
+  addUseMonth,
+  setEndCal,
+  setStartCal,
+  submitPageInfo,
+} from '../../modules/calendar';
 
 interface Props {}
 
 export function useModal() {
-  const { title } = useSelector((state: RootState) => ({
+  const { title, info, response } = useSelector((state: RootState) => ({
     title: state.calendar.title,
+    info: state.calendar.info,
+    response: state.calendar.response,
   }));
   const [modal, setModal] = useState(false);
 
@@ -22,6 +31,7 @@ export function useModal() {
       alert('입력칸이 비어 있습니다.');
       return;
     }
+    dispatch(addUseDaysCal());
     setModal(true);
   };
   const onCancel = () => {
@@ -29,14 +39,16 @@ export function useModal() {
   };
   const onConfirm = () => {
     setModal(false);
+    dispatch(addUseMonth());
+    dispatch(submitPageInfo(info));
   };
   const onSetStart = (time: number) => {
     dispatch(setStart(time));
-    console.log(time);
+    dispatch(setStartCal(time));
   };
   const onSetEnd = (time: number) => {
     dispatch(setEnd(time));
-    console.log(time);
+    dispatch(setEndCal(time));
   };
   return {
     modal,
@@ -46,6 +58,7 @@ export function useModal() {
     onSetStart,
     onSetEnd,
     title,
+    response,
   };
 }
 
@@ -124,14 +137,8 @@ const StyledButton = styled(Button)`
 `;
 
 export default function Modal({ visible, onCancel, onConfirm }: any) {
-  const {
-    modal,
-    onNextClick,
-
-    onSetStart,
-    onSetEnd,
-    title,
-  } = useModal();
+  const { modal, onNextClick, response, onSetStart, onSetEnd, title } =
+    useModal();
   if (!visible) return null;
   return (
     <FullScreen>
@@ -142,7 +149,7 @@ export default function Modal({ visible, onCancel, onConfirm }: any) {
         <p></p>
         <div className="buttons">
           <StyledButton onClick={onCancel}>취소</StyledButton>
-          <StyledButton cyan onClick={onConfirm} to="/register">
+          <StyledButton cyan to="/register" onClick={onConfirm}>
             확인
           </StyledButton>
         </div>
