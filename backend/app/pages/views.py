@@ -109,23 +109,6 @@ def dates(request):
         serializer = GetDatesSerializer(query_set, many=True)
         return JsonResponse(serializer.data, safe=False)
 
-    elif request.method == "POST":
-        # client에서 온 JSON 데이터 파싱 -> dict
-        data = JSONParser().parse(request)
-
-        # 제일 최근에 생성한 private_page 튜플 id값을 연관된 page로 인식한다고 가정
-        private_page_id = private_pages.objects.all().count()
-
-        calendar_dates.objects.create(
-            private_page_id=private_page_id)
-
-        id = calendar_dates.objects.all().count()
-
-        calendar_dates.objects.filter(private_page_id=private_page_id, id=id).update(
-            year=data['year'], month=data['month'], day=data['day'], day_of_week=data['day_of_week'])
-
-        return JsonResponse({'private_pages': list(private_pages.objects.filter(id=private_page_id).values()), 'calendar_dates': list(calendar_dates.objects.filter(private_page_id=private_page_id).values())})
-
 
 # @login_decorator
 def members(request):
