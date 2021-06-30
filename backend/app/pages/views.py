@@ -50,7 +50,7 @@ def pages_list(request):
         # 해당 튜플에 고유한 url 삽입
         private_pages.objects.filter(id=id).update(url=url)
 
-        return HttpResponse(status=200)
+        return JsonResponse({'id': id, 'url': url}, status=200)
 
 
 # 고유한 페이지 조회
@@ -229,16 +229,17 @@ class RegisterView(View):
                 for date in calendar_date:
                     date_id = date.id
                     print(date_id)
-                    # available_times.objects.create(
-                    #     group_member_id=user_id, calendar_date_id=date_id, time=dates['time'])
+                    if available_times.objects.filter(group_member_id=user_id, calendar_date_id=date_id, time=dates['time']).exists() == 0:
+                        available_times.objects.create(
+                            group_member_id=user_id, calendar_date_id=date_id, time=dates['time'])
             else:
                 return HttpResponse('calendar_dates is empty')
 
         print('\n\n\n\\')
         page_url = page_serializer.data['url']
         print('\n\n\n\\')
-        sql_query_set = private_pages.objects.raw(
-            'select * from private_pages join calendar_dates on private_pages.id = calendar_dates.private_page_id join group_members on group_members.private_page_id = private_pages.id join available_times on group_members.id = available_times.group_member_id where url=\"'+page_url+'\"')
+        sql_query_set = available_times.objects.raw(
+            'select available_times.id, month, day, name, time from available_times join calendar_dates on available_times.calendar_date_id = calendar_dates.id join group_members on available_times.group_member_id = group_members.id')
         print('\n\n\n\\')
         print('*****    joined_page_with_date    ******')
 
@@ -247,10 +248,9 @@ class RegisterView(View):
         print('\n\n\n\\')
         print("&&& 페이지 정보 조회 $$$")
         for row in sql_query_set:
-            print(row)
-            # print(', '.join(
-            #     ['{}: {}'.format(field, getattr(row, field))
-            #       for field in ['id', 'url', 'calendar_date_id', 'year', 'month', 'day', 'day_of_week', 'group_member_id', 'name', 'time']]
-            #     # for field in ['p.url', 'd.year', 'd.month', 'd.day', 'd.day_of_week', 'm.name', 't.time']]
-            # ))
+            print(', '.join(
+                ['{}: {}'.format(field, getattr(row, field))
+                  for field in ['id', 'month', 'day', 'name', 'time']]
+                # for field in ['p.url', 'd.year', 'd.month', 'd.day', 'd.day_of_week', 'm.name', 't.time']]
+            ))
         return HttpResponse('successfully register')
