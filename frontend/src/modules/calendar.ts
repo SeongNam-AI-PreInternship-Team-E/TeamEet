@@ -8,7 +8,7 @@ import { createAction } from 'redux-actions';
 import createRequestSaga from '../hooks/createRequestSaga';
 import * as api from '../lib/api/admin';
 import { takeLatest } from 'redux-saga/effects';
-import { date } from 'fp-ts';
+import { cons } from 'fp-ts/lib/ReadonlyNonEmptyArray';
 export type Days = {
   day: number;
   present: boolean;
@@ -18,6 +18,8 @@ export type Days = {
   select: boolean;
   month: number;
   week: number;
+  weekOfDay: number;
+  year: number;
 };
 export type PickDay = {
   month: number;
@@ -37,6 +39,11 @@ export type Date = {
   day_of_week: string;
 };
 
+export type Info = {
+  page: Page;
+  solve: Date[];
+};
+
 type initial = {
   weekOfDay: any[];
   Days: Days[];
@@ -47,8 +54,10 @@ type initial = {
   title: string;
   pickArr: number[];
   teamMonth: any;
-  page: Page;
-  Dates: Date[];
+  info: Info;
+  url: string;
+  response: any;
+  error: string;
 };
 export type Times = {
   start_hour: string;
@@ -59,17 +68,13 @@ export type DaysState = Days[];
 export type TimesState = Times[];
 
 const PAGE = 'calendar/PAGE';
-const DATES = 'calendar/DATES';
 
-export const submitPageInfo = createAction(PAGE, (page: Page) => page);
-export const submitDatesInfo = createAction(DATES, (date: Date) => date);
+export const submitPageInfo = createAction(PAGE, (info: Info) => info);
 
 const pageSaga = createRequestSaga(PAGE, api.sendPage);
-const dateSaga = createRequestSaga(DATES, api.sendDates);
 
 export function* calendarSaga() {
   yield takeLatest(PAGE, pageSaga);
-  yield takeLatest(DATES, dateSaga);
 }
 
 const initialState: initial = {
@@ -82,26 +87,38 @@ const initialState: initial = {
   end_hour: 0,
   pickArr: [],
   teamMonth: {},
-  page: {
-    title: '',
-    max_time: 9,
-    min_time: 12,
+  info: {
+    page: {
+      title: '',
+      max_time: 0,
+      min_time: 0,
+    },
+    solve: [],
   },
-  Dates: [],
+  url: '',
+  response: '',
+  error: '',
 };
 
 export const daysSlice = createSlice({
-  name: 'days',
+  name: 'calendar',
   initialState,
   reducers: {
     PAGE_SUCCESS: (state, action: PayloadAction<any>) => {
-      state.page = action.payload;
+      state.response = action.payload;
+      state.url = state.response.private_pages[0].url;
     },
-    DATES_SUCCESS: (state, action: PayloadAction<any>) => {
-      state.Dates = action.payload;
+    PAGE_FAILURE: (state, action: PayloadAction<any>) => {
+      state.error = action.payload;
     },
     setDay: (state, action: PayloadAction<any>) => {
       state.month = action.payload;
+    },
+    setStartCal: (state, action: PayloadAction<any>) => {
+      state.info.page.min_time = action.payload;
+    },
+    setEndCal: (state, action: PayloadAction<any>) => {
+      state.info.page.max_time = action.payload;
     },
     setInitialDate: (state) => {
       state.Days = [];
@@ -110,6 +127,7 @@ export const daysSlice = createSlice({
       let i = 1;
       let k = 0;
       const LastMonth = state.month.subtract(1, 'M');
+
       const LastMonthEndDay = LastMonth.endOf('M');
       const LastMonthNum = LastMonth.month() + 1;
 
@@ -120,7 +138,7 @@ export const daysSlice = createSlice({
       const NextMonth = state.month.add(1, 'M').month() + 1;
 
       let subDate = LastMonthEndDay.date();
-      console.log(subDate);
+
       for (i = subDate - presentMonthStartDay + 1; i <= subDate; i++) {
         state.Days.push({
           day: i,
@@ -131,6 +149,8 @@ export const daysSlice = createSlice({
           month: LastMonthNum,
           select: false,
           week: Math.floor(k / 7) + 1,
+          weekOfDay: k % 7,
+          year: 2021,
         });
         k++;
       }
@@ -153,6 +173,8 @@ export const daysSlice = createSlice({
           month: preMonth,
           select: false,
           week: Math.floor(k / 7) + 1,
+          weekOfDay: k % 7,
+          year: 2021,
         });
         k++;
       }
@@ -175,6 +197,8 @@ export const daysSlice = createSlice({
           month: NextMonth,
           select: false,
           week: Math.floor(k / 7) + 1,
+          weekOfDay: k % 7,
+          year: 2021,
         });
         i++;
         k++;
@@ -211,9 +235,16 @@ export const daysSlice = createSlice({
         } else if (days.present) {
           days.color = '#5465FF';
           days.text_color = 'white';
-          const { day, month, key, week } = days;
+          const { day, month, key, week, weekOfDay, year } = days;
           if (state.PickDays[month])
-            state.PickDays[month].push({ day, month, key, week });
+            state.PickDays[month].push({
+              day,
+              month,
+              key,
+              week,
+              weekOfDay,
+              year,
+            });
         }
       }
     },
@@ -231,23 +262,46 @@ export const daysSlice = createSlice({
         } else if (days.present) {
           days.color = '#5465FF';
           days.text_color = 'white';
-          const { day, month, key, week } = days;
+          const { day, month, key, week, weekOfDay, year } = days;
           if (!state.PickDays[month]) {
             state.PickDays[month - 1] = [];
             state.PickDays[month] = [];
             state.PickDays[month + 1] = [];
           }
-          state.PickDays[month].push({ day, month, key, week });
+          state.PickDays[month].push({
+            day,
+            month,
+            key,
+            week,
+            year,
+            weekOfDay,
+          });
         }
       }
     },
     addTitle: (state, action: PayloadAction<string>) => {
       state.title = action.payload;
     },
-    addUseMonth: (state, action: PayloadAction) => {},
+    addUseMonth: (state) => {
+      state.info.page.title = state.title;
+      state.info.page.min_time = state.start_hour;
+      state.info.page.max_time = state.end_hour;
+    },
+    addUseDaysCal: (state) => {
+      if (state.PickDays[7]) {
+        for (let i = 0; i < state.PickDays[7].length; i++) {
+          const { day, month, weekOfDay, year } = state.PickDays[7][i];
+          state.info.solve.push({
+            day: day,
+            month: month,
+            day_of_week: weekOfDay,
+            year: year,
+          });
+        }
+      }
+    },
   },
 });
-// 에어팟좀 찾골올게요네
 
 export const {
   addDays,
@@ -258,6 +312,12 @@ export const {
   addTitle,
   setDay,
   setInitialDate,
+  setStartCal,
+  setEndCal,
+  addUseMonth,
+  addUseDaysCal,
+  PAGE_SUCCESS,
+  PAGE_FAILURE,
 } = daysSlice.actions;
 
 export default daysSlice.reducer;
