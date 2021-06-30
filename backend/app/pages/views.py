@@ -4,7 +4,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.serializers import SerializerMetaclass
 from .models import *
 from .serializers import *
-from django.views.decorators.csrf import csrf_exempt
+#from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -19,38 +19,33 @@ import jwt  # 토큰 발행에 사용
 from app.settings import SECRET_KEY, ALGORITHM  # 토큰 발행에 사용할 secret key, algorithm
 from .utils import login_decorator
 
+
 # 페이지 조회 및 생성
+class PagesView(View):
+    def get(self, request):
+        return JsonResponse({'private_pages': list(private_pages.objects.filter().values())}, status=200)
 
+    def post(self, request):
+        data = json.loads(request.body)
 
-# @csrf_exempt
-def pages_list(request):
-    if request.method == "GET":
-        query_set = private_pages.objects.all()
-        serializer = GetPagesSerializer(query_set, many=True)
-        return JsonResponse(serializer.data, safe=False)
-
-    elif request.method == "POST":
-        data = JSONParser().parse(request)
-
-        serializer = PagesSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-
-        # 제일 최근에 생성한(url이 포함되지 않은) 튜플 id값
-        id = private_pages.objects.all().count()
-        print(id)
+        page = private_pages.objects.last()
 
         # 고유한 url 형식:id-secure_code
         length_of_string = 5
         secure_code = ''.join(random.choice(
             string.ascii_letters) for _ in range(length_of_string))
-        url = str(id) + '-' + secure_code
+        url = str(page.id+1) + '-' + secure_code
 
-        print(url)
-        # 해당 튜플에 고유한 url 삽입
-        private_pages.objects.filter(id=id).update(url=url)
+        private_pages.objects.create(
+            url=url, title=data['title'], min_time=data['min_time'], max_time=data['max_time'])
 
-        return JsonResponse({'id': id, 'url': url}, status=200)
+        # calendar FK에 들어갈 private_page_id 값을 위한 변수
+        page = private_pages.objects.get(url=url)
+
+        for date in data['calendar_dates']:
+            calendar_dates.objects.create(
+                private_page_id=page.id, year=date['year'], month=date['month'], day=date['day'], day_of_week=date['day_of_week'])
+        return JsonResponse({'private_pages': list(private_pages.objects.filter(url=url).values()), 'calendar_dates': list(calendar_dates.objects.filter(private_page_id=page.id).values())}, status=200)
 
 
 # 고유한 페이지 조회
