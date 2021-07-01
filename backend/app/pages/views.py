@@ -145,19 +145,19 @@ class SignUpView(View):
 
 # @csrf_exempt
 class DatesView(View):
-    def get(self,request):
+    def get(self, request):
         query_set = calendar_dates.objects.all()
         serializer = GetDatesSerializer(query_set, many=True)
         return JsonResponse(serializer.data, safe=False)
 
 
-
 class MembersView(View):
    # @ login_decorator
-    def get(self,request):
-            query_set = group_members.objects.all()
-            serializer = GetMembersSerializer(query_set, many=True)
-            return JsonResponse(serializer.data, safe=False)
+    def get(self, request):
+        query_set = group_members.objects.all()
+        serializer = GetMembersSerializer(query_set, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
 
 class SignInView(View):
     def post(self, request, url):
@@ -208,10 +208,60 @@ class SignInView(View):
             return JsonResponse({"message": "INVALID_KEYS"}, status=400)
 
 
-
-
-
 class RegisterView(View):
+    @login_decorator
+    def get(self, request, url):
+        try:
+            # 고유 url에 대한 private_pages 튜플 정보 가져옴
+            page = private_pages.objects.get(url=url)
+        except private_pages.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        page_serializer = GetPagesSerializer(page)
+
+        print('\n\n\n\\')
+        sql_query_set = available_times.objects.raw(
+            'select available_times.id, year, month, day, name, time, group_members.private_page_id from available_times join calendar_dates on available_times.calendar_date_id = calendar_dates.id join group_members on available_times.group_member_id = group_members.id where group_members.private_page_id=\"'+str(page_serializer.data['id'])+'\"')
+        print('\n\n\n\\')
+        print('*****    joined_page_with_date    ******')
+
+        print(sql_query_set)
+
+        print('\n\n\n\\')
+        print("&&& 페이지 정보 조회 $$$")
+        group_info = defaultdict(list)
+        time_count = defaultdict(int)
+        for row in sql_query_set:
+            group_info['avail_month'].append(int(row.month))
+            group_info['avail_month'] = sorted(
+                list(set(group_info['avail_month'])))
+            group_info[row.month] = defaultdict(list)
+        for row in sql_query_set:
+
+            group_info[row.month]['avail_date'].append(int(row.day))
+            group_info[row.month]['avail_date'] = sorted(
+                list(set(group_info[row.month]['avail_date'])))
+            group_info[row.month][row.day] = defaultdict(list)
+        for row in sql_query_set:
+
+            group_info[row.month][row.day]['avail_time'].append(int(row.time))
+            group_info[row.month][row.day]['avail_time'] = sorted(
+                list(set(group_info[row.month][row.day]['avail_time'])))
+            group_info[row.month][row.day]['count'] = []
+            # key 값 생성
+            group_date = row.year+'-'+row.month+'-'+row.day+'-'+row.time
+
+            # key-value 저장, 기존에 key값이 존재 한다면 value ++
+            time_count[group_date] += 1
+
+        time_count_keys = list(time_count.keys())
+
+        for time_count_key in time_count_keys:
+            time_count_key_index = time_count_key.split('-')
+            group_info[time_count_key_index[1]][time_count_key_index[2]
+                                                ]['count'].append(int(time_count[time_count_key]))
+
+        return JsonResponse(group_info, status=200)
+
     @ login_decorator
     def post(self, request, url):
         try:
