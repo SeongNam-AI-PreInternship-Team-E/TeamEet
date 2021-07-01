@@ -144,7 +144,7 @@ class SignUpView(View):
 
 
 # @csrf_exempt
-class datesView(View):
+class DatesView(View):
     def get(self,request):
         query_set = calendar_dates.objects.all()
         serializer = GetDatesSerializer(query_set, many=True)
