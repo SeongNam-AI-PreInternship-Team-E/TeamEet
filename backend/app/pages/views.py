@@ -143,8 +143,8 @@ class SignUpView(View):
 
 
 # @csrf_exempt
-def dates(request):
-    if request.method == "GET":
+class datesView(View):
+    def get(self,request):
         query_set = calendar_dates.objects.all()
         serializer = GetDatesSerializer(query_set, many=True)
         return JsonResponse(serializer.data, safe=False)
