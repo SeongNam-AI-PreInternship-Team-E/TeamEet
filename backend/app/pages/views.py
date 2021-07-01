@@ -1,3 +1,4 @@
+from django.db.models.expressions import Exists
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework.serializers import SerializerMetaclass
@@ -265,21 +266,36 @@ class RegisterView(View):
 
         print('\n\n\n\\')
         print("&&& 페이지 정보 조회 $$$")
-
-        group_info = defaultdict(int)
+        group_info = defaultdict(list)
+        time_count = defaultdict(int)
         for row in sql_query_set:
-            # print(', '.join(
-            #     ['{}: {}'.format(field, getattr(row, field))
-            #       for field in ['id', 'month', 'day', 'private_page_id', 'name', 'time']]
-            # ))
+            group_info['avail_month'].append(int(row.month))
+            group_info['avail_month'] = sorted(
+                list(set(group_info['avail_month'])))
+            group_info[row.month] = defaultdict(list)
+        for row in sql_query_set:
 
-            # group_dates = {"date_time": row.year+'-' +
-            #                row.month+'-'+row.day+'-'+row.time, "count": 1}
+            group_info[row.month]['avail_date'].append(int(row.day))
+            group_info[row.month]['avail_date'] = sorted(
+                list(set(group_info[row.month]['avail_date'])))
+            group_info[row.month][row.day] = defaultdict(list)
+        for row in sql_query_set:
 
+            group_info[row.month][row.day]['avail_time'].append(int(row.time))
+            group_info[row.month][row.day]['avail_time'] = sorted(
+                list(set(group_info[row.month][row.day]['avail_time'])))
+            group_info[row.month][row.day]['count'] = []
             # key 값 생성
             group_date = row.year+'-'+row.month+'-'+row.day+'-'+row.time
+
             # key-value 저장, 기존에 key값이 존재 한다면 value ++
-            group_info[group_date] += 1
-        print(group_info)
+            time_count[group_date] += 1
+
+        time_count_keys = list(time_count.keys())
+
+        for time_count_key in time_count_keys:
+            time_count_key_index = time_count_key.split('-')
+            group_info[time_count_key_index[1]][time_count_key_index[2]
+                                                ]['count'].append(int(time_count[time_count_key]))
 
         return JsonResponse(group_info, status=200)
