@@ -17,6 +17,20 @@ HTTP API 방식으로 JSON을 결과값으로 출력합니다.
 
 ![ex_screenshot](./img/architecture.png)
 
+## **Database Modeling**
+<img width="701" alt="스크린샷 2021-07-01 오후 8 37 34" src="https://user-images.githubusercontent.com/84854251/124118498-5f1e8d80-daac-11eb-94cc-c4bcb509448b.png">
+
+## **팀원소개**
+
+| 이름 | 개발분야 | 담당 |
+|:---:|:---:|:---:|
+|박근우|Back-end|API Design,ERD modeling, Cloud|
+|김다빈|Back-end|Cloud|
+|김청환|Back-end|Database Design|
+|장동현|Front-end|Web development|
+|김유신|Front-end|Web development|
+
+
 <br>
 
 ## **Git Convention**
