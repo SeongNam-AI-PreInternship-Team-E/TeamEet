@@ -22,7 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('pages/', views.PagesView.as_view()),
     path('pages/<str:url>/', views.pages),
-    path('pages/<str:url>/users/', views.pages_users),
+    path('pages/<str:url>/users/', views.SignUpView.as_view()),
     path('pages/<str:url>/sign-in/', views.SignInView.as_view()),
     path('pages/<str:url>/register/', views.RegisterView.as_view()),
     path('dates/', views.dates),
