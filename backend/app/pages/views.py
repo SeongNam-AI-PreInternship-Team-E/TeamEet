@@ -243,7 +243,8 @@ class RegisterView(View):
             group_info[row.month][row.day] = defaultdict(list)
         for row in sql_query_set:
 
-            group_info[row.month][row.day]['avail_time'].append(int(row.time))
+            group_info[row.month][row.day]['avail_time'].append(
+                float(row.time))
             group_info[row.month][row.day]['avail_time'] = sorted(
                 list(set(group_info[row.month][row.day]['avail_time'])))
             group_info[row.month][row.day]['count'] = []
@@ -327,7 +328,8 @@ class RegisterView(View):
             group_info[row.month][row.day] = defaultdict(list)
         for row in sql_query_set:
 
-            group_info[row.month][row.day]['avail_time'].append(int(row.time))
+            group_info[row.month][row.day]['avail_time'].append(
+                float(row.time))
             group_info[row.month][row.day]['avail_time'] = sorted(
                 list(set(group_info[row.month][row.day]['avail_time'])))
             group_info[row.month][row.day]['count'] = []
