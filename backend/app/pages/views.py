@@ -1,10 +1,9 @@
-from django.db.models.expressions import Exists
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework.serializers import SerializerMetaclass
 from .models import *
 from .serializers import *
-#from django.views.decorators.csrf import csrf_exempt
+# from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -18,6 +17,8 @@ import json
 import jwt  # 토큰 발행에 사용
 from app.settings import SECRET_KEY, ALGORITHM  # 토큰 발행에 사용할 secret key, algorithm
 from .utils import login_decorator
+
+from collections import defaultdict
 
 
 # 페이지 조회 및 생성
@@ -228,7 +229,7 @@ class RegisterView(View):
         page_url = page_serializer.data['url']
         print('\n\n\n\\')
         sql_query_set = available_times.objects.raw(
-            'select available_times.id, month, day, name, time from available_times join calendar_dates on available_times.calendar_date_id = calendar_dates.id join group_members on available_times.group_member_id = group_members.id')
+            'select available_times.id, year, month, day, name, time, group_members.private_page_id from available_times join calendar_dates on available_times.calendar_date_id = calendar_dates.id join group_members on available_times.group_member_id = group_members.id where group_members.private_page_id=\"'+str(page_serializer.data['id'])+'\"')
         print('\n\n\n\\')
         print('*****    joined_page_with_date    ******')
 
@@ -236,9 +237,21 @@ class RegisterView(View):
 
         print('\n\n\n\\')
         print("&&& 페이지 정보 조회 $$$")
+
+        group_info = defaultdict(int)
         for row in sql_query_set:
-            print(', '.join(
-                ['{}: {}'.format(field, getattr(row, field))
-                  for field in ['id', 'month', 'day', 'name', 'time']]
-            ))
-        return HttpResponse('successfully register')
+            # print(', '.join(
+            #     ['{}: {}'.format(field, getattr(row, field))
+            #       for field in ['id', 'month', 'day', 'private_page_id', 'name', 'time']]
+            # ))
+
+            # group_dates = {"date_time": row.year+'-' +
+            #                row.month+'-'+row.day+'-'+row.time, "count": 1}
+
+            # key 값 생성
+            group_date = row.year+'-'+row.month+'-'+row.day+'-'+row.time
+            # key-value 저장, 기존에 key값이 존재 한다면 value ++
+            group_info[group_date] += 1
+        print(group_info)
+
+        return JsonResponse(group_info, status=200)
