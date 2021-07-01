@@ -151,13 +151,13 @@ def dates(request):
         return JsonResponse(serializer.data, safe=False)
 
 
-# @login_decorator
-def members(request):
-    if request.method == "GET":
-        query_set = group_members.objects.all()
-        serializer = GetMembersSerializer(query_set, many=True)
-        return JsonResponse(serializer.data, safe=False)
 
+class MembersView(View):
+   # @ login_decorator
+    def get(self,request):
+            query_set = group_members.objects.all()
+            serializer = GetMembersSerializer(query_set, many=True)
+            return JsonResponse(serializer.data, safe=False)
 
 class SignInView(View):
     def post(self, request, url):
@@ -208,11 +208,7 @@ class SignInView(View):
             return JsonResponse({"message": "INVALID_KEYS"}, status=400)
 
 
-class MemberView(View):
-    @ login_decorator
-    def get(self, request):
-        print("get-test")
-        return JsonResponse({'group_member': list(group_members.objects.values())}, status=200)
+
 
 
 class RegisterView(View):
