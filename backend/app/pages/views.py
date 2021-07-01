@@ -209,7 +209,7 @@ class SignInView(View):
 
 
 class RegisterView(View):
-    @login_decorator
+    # @login_decorator
     def get(self, request, url):
         try:
             # 고유 url에 대한 private_pages 튜플 정보 가져옴
