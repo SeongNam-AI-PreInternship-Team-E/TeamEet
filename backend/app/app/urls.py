@@ -25,7 +25,7 @@ urlpatterns = [
     path('pages/<str:url>/users/', views.SignUpView.as_view()),
     path('pages/<str:url>/sign-in/', views.SignInView.as_view()),
     path('pages/<str:url>/register/', views.RegisterView.as_view()),
-    path('dates/', views.dates),
+    path('dates/', view.DatesView.as_view()),
     path('members/', views.MembersView.as_view()),
     
 
