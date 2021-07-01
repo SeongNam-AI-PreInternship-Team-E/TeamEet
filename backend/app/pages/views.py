@@ -73,45 +73,73 @@ def pages(request, url):
         return JsonResponse(serializer.data)
 
 
-# 고유한 페이지 유저 조회 및 생성
-# @csrf_exempt
-def pages_users(request, url):
-    try:
-        # 고유 url에 대한 private_pages 튜플 정보 가져옴
-        page = private_pages.objects.get(url=url)
-    except private_pages.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+# 고유한 페이지 회원가입
+class SignUpView(View):
+    def get(self, request, url):
+        try:
+            # 고유 url에 대한 private_pages 튜플 정보 가져옴
+            page = private_pages.objects.get(url=url)
+        except private_pages.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == "GET":
-        query_set = group_members.objects.all()
-        serializer = GetMembersSerializer(query_set, many=True)
-        return JsonResponse(serializer.data, safe=False)
+        if request.method == "GET":
+            query_set = group_members.objects.all()
+            serializer = GetMembersSerializer(query_set, many=True)
+            return JsonResponse(serializer.data, safe=False)
 
-    elif request.method == "POST":
-        # client에서 온 회원가입할 Users JSON 데이터 파싱 -> dict
-        data = JSONParser().parse(request)
+    def post(self, request, url):
+        try:
+            # 고유 url에 대한 private_pages 튜플 정보 가져옴
+            page = private_pages.objects.get(url=url)
+        except private_pages.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        data = json.loads(request.body)
         page_serializer = GetPagesSerializer(page)
+
+        if group_members.objects.filter(name=data['name'], private_page_id=page_serializer.data['id']).exists() != False:
+            return HttpResponse('Alreay existed')
+
+        # 회원가입
+        group_members.objects.create(
+            private_page_id=page_serializer.data['id'], name=data['name'], password=data['password'])
 
         # 파라미터 url을 통해 직렬화된 private_pages 인스턴스 id 값 추출
         private_page_id = page_serializer.data['id']
+        try:
+            if group_members.objects.filter(name=data['name'], private_page_id=private_page_id).exists():
+                user = group_members.objects.get(
+                    name=data['name'], private_page_id=private_page_id)
+                print('비밀번호 확인 앞')
+                #---------비밀번호 확인--------#
+                if data['password'] == user.password:
+                    print('비밀번호 확인 뒤')
+                    dates_info = list(
+                        calendar_dates.objects.filter(private_page_id=page_serializer.data['id']).values())
+                    dates_month_info = [
+                        date['month'] for date in dates_info]
+                    dates_month_info = sorted(list(set(dates_month_info)))
+                    #----------토큰 발행----------#
 
-        # client에서 들어온 name 값이 해당 url 페이지 내에 회원으로 존재하는지 중복 유무 확인
-        if group_members.objects.filter(name=data['name'], private_page_id=private_page_id).exists() != False:
-            return HttpResponse('Alreay existed')
+                    token = jwt.encode(
+                        {'name': data['name'], 'private_page_id': private_page_id}, SECRET_KEY, ALGORITHM)
+                    #-----------------------------#
 
-        # not null인 private_page_id 값을 넣어 튜플 생성
-        group_members.objects.create(
-            private_page_id=private_page_id)
+                    # 토큰을 담아서 응답
+                    return JsonResponse({"token": token,
+                                        'private_pages': list(private_pages.objects.filter(url=page_serializer.data['url']).values()),
+                                         'calendar_dates': dates_info,
+                                         'month': dates_month_info,
+                                         'sigined_up_group_member_id': user.id},
+                                        status=200)
 
-        # 제일 최근에 생성한 group_members 튜플 id값을 연관된 테이블로 인식
-        recent_member = GetMembersSerializer(group_members.objects.last())
+            else:
+                return HttpResponse(status=401)
 
-        # client에서 온 name, password 값 상단에서 생성된 튜플 내에 업데이트
-        group_members.objects.filter(private_page_id=private_page_id, id=recent_member.data['id']).update(
-            name=data['name'], password=data['password'])
+            return HttpResponse(status=400)
 
-        # return HttpResponse('Successfully signed up')
-        return JsonResponse({'signed_up_group_member': recent_member.data['id']}, status=200)
+        except KeyError:
+            return JsonResponse({"message": "INVALID_KEYS"}, status=400)
 
 
 # @csrf_exempt
