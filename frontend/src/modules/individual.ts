@@ -4,6 +4,7 @@ import { createAction } from 'redux-actions';
 import createRequestSaga from '../hooks/createRequestSaga';
 import * as api from '../lib/api/indivisual';
 import { takeLatest } from 'redux-saga/effects';
+
 type changeDay = {
   check: boolean;
   day: number;
@@ -34,6 +35,7 @@ type initial = {
   canPickWeek: any;
   change: changeDay;
   calendar_dates: sendWeek[];
+  can_calendar_dates: any[];
 };
 
 const initialState: initial = {
@@ -41,13 +43,14 @@ const initialState: initial = {
   PickTime: [],
   PickDays: [],
   IndividualTime: [],
-  startHour: 10,
-  endHour: 20,
+  startHour: 2,
+  endHour: 8,
   month: 7,
   presentWeek: 1,
   canPickWeek: {},
   change: { check: false, day: 0 },
   calendar_dates: [],
+  can_calendar_dates: [],
 };
 
 const TIMES = 'timeTable/TIMES';
@@ -218,7 +221,8 @@ export const individualSlice = createSlice({
                 state.PickTime[j].push({
                   time: i,
                   day: state.PickWeek[j].day,
-                  canSee: true,
+                  canSee: false,
+                  trash: true,
                 });
               }
             }
@@ -226,6 +230,29 @@ export const individualSlice = createSlice({
         }
       }
     },
+    addLoginTime: (state) => {
+      if (state.can_calendar_dates) {
+        for (let i in state.can_calendar_dates) {
+          for (let j = 1; j <= 7; j++) {
+            const canDay = Number(state.can_calendar_dates[i].day);
+
+            if (state.PickTime[j]) {
+              if (canDay === state.PickTime[j][1].day) {
+                console.log('존재');
+                for (let k = 0; k < state.PickTime[j].length; k++) {
+                  state.PickTime[j][k].trash = false;
+                  state.PickTime[j][k].canSee = true;
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    cloneSever: (state, action: PayloadAction<any>) => {
+      state.can_calendar_dates = lodash.cloneDeep(action.payload);
+    },
+
     addNormalTime: (state) => {
       newFunction(state);
     },
@@ -475,6 +502,8 @@ export const {
   clickIndividualMonth,
   clonePresentWeek,
   pushDates,
+  cloneSever,
+  addLoginTime,
 } = individualSlice.actions;
 
 export default individualSlice.reducer;
