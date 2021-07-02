@@ -7,6 +7,7 @@ import TeamCalendarPresent from './TeamCalendarPresent';
 import { useEffect, useState } from 'react';
 import qs from 'qs';
 import {
+  addUseInDay,
   addUseMonth,
   canChoosePick,
   changeWeekColor,
@@ -28,8 +29,11 @@ import {
   clonePresentWeek,
   pushDates,
   submitTimeInfo,
+  cloneSever,
+  addLoginTime,
 } from '../../modules/individual';
 import { setInitialDate } from '../../modules/calendar';
+import { cloneUrl } from '../../modules/teamtime';
 
 function useTimeCalendar() {
   const {
@@ -45,6 +49,7 @@ function useTimeCalendar() {
     calendar_dates,
     calendar_datess,
     url,
+    url2,
     Authorization,
   } = useSelector((state: RootState) => ({
     teamMonth: state.timetable.teamMonth,
@@ -59,6 +64,7 @@ function useTimeCalendar() {
     calendar_dates: state.individual.calendar_dates,
     calendar_datess: state.auth.calendar_dates,
     url: state.calendar.url,
+    url2: state.auth.url2,
     Authorization: state.auth.Authorization,
   }));
   const dispatch = useDispatch();
@@ -67,34 +73,49 @@ function useTimeCalendar() {
     setInitialDate();
     clonePickDays(PickDays);
     cloneDays(PickDays);
-  });
+  }, [dispatch, PickDays]);
   useEffect(() => {
     dispatch(addUseMonth());
     dispatch(searchMinWeek());
     dispatch(cloneWeek(PickWeek));
+    dispatch(addLoginTime());
     dispatch(pushDates());
     dispatch(addTimes());
-    if (calendar_dates.length !== 0) {
-      dispatch(
-        submitTimeInfo({
-          url: url,
-          calendar_dates: calendar_dates,
-          Authorization: Authorization,
-        })
-      );
-    }
     dispatch(addNormalTime());
+    dispatch(cloneUrl(url2));
+    if (calendar_datess) {
+      dispatch(cloneInDates(calendar_datess));
+      dispatch(cloneSever(calendar_datess));
+      dispatch(addUseInDay());
+    }
+    if (calendar_dates.length !== 0) {
+      url === ''
+        ? dispatch(
+            submitTimeInfo({
+              url: url2,
+              calendar_dates: calendar_dates,
+              Authorization: Authorization,
+            })
+          )
+        : dispatch(
+            submitTimeInfo({
+              url: url,
+              calendar_dates: calendar_dates,
+              Authorization: Authorization,
+            })
+          );
+    }
+
     dispatch(setTimeColor());
     dispatch(clonePresentWeek(presentWeek));
+    dispatch(addLoginTime());
     // dispatch(clickWeek(showSelect));
     // dispatch(clickWeek(presentWeek));
   }, [dispatch, PickWeek, presentWeek]);
   useEffect(() => {
     dispatch(changeWeekColor());
-    dispatch(searchMinWeek());
     dispatch(clickWeek(showSelect));
-    dispatch(cloneInDates(calendar_datess));
-  }, [dispatch, showSelect, calendar_datess]);
+  }, [dispatch, showSelect]);
   useEffect(() => {
     onChangeWeek(showSelect);
   }, [dispatch, showSelect]);
@@ -103,9 +124,12 @@ function useTimeCalendar() {
     dispatch(clickWeek(week));
     dispatch(changeWeekColor());
     dispatch(cloneWeek(PickWeek));
+    dispatch(addLoginTime());
     dispatch(pushDates());
-    dispatch(addTimes());
-    dispatch(addNormalTime());
+    // dispatch(pushDates());
+    // dispatch(addTimes());
+    // dispatch(addNormalTime());
+
     // if (calendar_dates) {
     //   dispatch(
     //     submitTimeInfo({
@@ -120,13 +144,10 @@ function useTimeCalendar() {
     dispatch(clickMonth(week));
     dispatch(clonePresentWeek(week));
     dispatch(clickIndividualMonth(week));
-
-    dispatch(searchMinWeek());
-
-    dispatch(addUseMonth());
-    dispatch(changeWeekColor());
-    dispatch(clickWeek(showSelect));
-    dispatch(setTimeColor());
+    // dispatch(searchMinWeek());
+    // dispatch(addUseMonth());
+    // dispatch(changeWeekColor());
+    // dispatch(clickWeek(showSelect));
   };
   return {
     teamMonth,
