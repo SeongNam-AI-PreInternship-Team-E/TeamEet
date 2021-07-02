@@ -42,6 +42,7 @@ export type initialTimeTable = {
   showSelect: number;
   calendar_dates: any[];
   availKey: any[];
+  url2: string;
 };
 
 const initialState: initialTimeTable = {
@@ -51,7 +52,7 @@ const initialState: initialTimeTable = {
   endHour: 0,
   month: dayjs().tz('Asia/Seoul').locale('ko'),
   presentWeek: 1,
-  PickDays: {},
+  PickDays: [],
   PickWeek: [],
   canPickWeek: {
     1: false,
@@ -65,6 +66,7 @@ const initialState: initialTimeTable = {
   showSelect: 1,
   calendar_dates: [],
   availKey: [],
+  url2: '',
 };
 
 export const timetableSlice = createSlice({
@@ -74,6 +76,9 @@ export const timetableSlice = createSlice({
   reducers: {
     setMonth: (state, action: PayloadAction<any>) => {
       state.month = action.payload;
+    },
+    cloneUrl: (state, action: PayloadAction<string>) => {
+      state.url2 = action.payload;
     },
     clonePickDays: (state, action: PayloadAction<any>) => {
       state.PickDays = lodash.cloneDeep(action.payload);
@@ -393,6 +398,7 @@ export const {
   clickWeek,
   searchMinWeek,
   clickMonth,
+
   // clickWeek2,
   cloneInDates,
 } = timetableSlice.actions;
