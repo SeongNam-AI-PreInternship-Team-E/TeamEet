@@ -281,6 +281,7 @@ export const daysSlice = createSlice({
     },
     addTitle: (state, action: PayloadAction<string>) => {
       state.title = action.payload;
+      state.info.page.title = action.payload;
     },
     addUseMonth: (state) => {
       state.info.page.title = state.title;
