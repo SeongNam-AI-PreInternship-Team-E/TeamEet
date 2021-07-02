@@ -337,9 +337,7 @@ export const teamSlice = createSlice({
       if (action.payload !== '') {
         if (state.response[state.monthNum]) {
           for (let i in state.response[state.monthNum].avail_date) {
-            console.log('i인덱스', i);
             const date = state.response[state.monthNum].avail_date[i];
-            console.log('date', date);
             for (let j = 1; j <= 7; j++) {
               if (state.PickWeek[j]) {
                 if (date === state.PickWeek[j].day) {
@@ -359,13 +357,13 @@ export const teamSlice = createSlice({
                           find.color = '#98a2ff';
                           break;
                         case 2:
-                          find.color = '#8793ff';
+                          find.color = '#5465FF';
                           break;
                         case 3:
-                          find.color = '#7683ff';
+                          find.color = '#5465FF';
                           break;
                         case 4:
-                          find.color = '#6574ff';
+                          find.color = '#5465FF';
                           break;
                         case 5:
                           find.color = '#5465FF';
