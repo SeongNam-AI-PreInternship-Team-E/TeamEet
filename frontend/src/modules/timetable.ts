@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import 'dayjs/plugin/timezone';
 import 'dayjs/locale/ko';
 import 'dayjs/plugin/utc';
+
 const timezone = require('dayjs/plugin/timezone');
 const utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
@@ -15,6 +16,7 @@ export type Times = {
   key: number;
   color: string;
   text_color: string;
+  availKey: any[];
   select: boolean;
   month: number;
   week: number;
@@ -38,6 +40,8 @@ export type initialTimeTable = {
   canPickWeek: any;
   canPickMonth: any;
   showSelect: number;
+  calendar_dates: any[];
+  availKey: any[];
 };
 
 const initialState: initialTimeTable = {
@@ -59,6 +63,8 @@ const initialState: initialTimeTable = {
   },
   canPickMonth: [],
   showSelect: 1,
+  calendar_dates: [],
+  availKey: [],
 };
 
 export const timetableSlice = createSlice({
@@ -72,27 +78,8 @@ export const timetableSlice = createSlice({
     clonePickDays: (state, action: PayloadAction<any>) => {
       state.PickDays = lodash.cloneDeep(action.payload);
     },
-    clickLastMonth: (state) => {
-      state.month = state.month.subtract(1, 'M');
-      state.canPickWeek = {
-        1: false,
-        2: false,
-        3: false,
-        4: false,
-        5: false,
-        6: false,
-      };
-    },
-    clickNextMonth: (state) => {
-      state.month = state.month.add(1, 'M');
-      state.canPickWeek = {
-        1: false,
-        2: false,
-        3: false,
-        4: false,
-        5: false,
-        6: false,
-      };
+    cloneInDates: (state, action: PayloadAction<any>) => {
+      state.calendar_dates = lodash.cloneDeep(action.payload);
     },
     searchMinWeek: (state) => {
       if (state.canPickWeek) {
@@ -101,15 +88,57 @@ export const timetableSlice = createSlice({
         }
       }
     },
+    addUseInDay: (state) => {
+      if (state.PickDays.length === 0) {
+        const preMonth = state.month.month() + 1;
+        if (state.calendar_dates) {
+          for (let i = 0; i < state.calendar_dates.length; i++) {
+            if (
+              state.month.month() + 1 ===
+              Number(state.calendar_dates[i].month)
+            ) {
+              const findDay = state.teamMonth[preMonth].find(
+                (day: any) =>
+                  day.key === Number(state.calendar_dates[i].day_of_week)
+              );
+              if (findDay) {
+                const canPick = Math.floor(findDay.key / 7) + 1;
+                if (state.canPickWeek[canPick] === false) {
+                  state.canPickWeek[canPick] = true;
+                }
+                state.availKey.push({
+                  key: findDay.key,
+                  week: canPick,
+                  month: findDay.month,
+                });
+                findDay.color = '#5465FF';
+                findDay.text_color = 'white';
+              }
+            }
+          }
+        }
+      }
+    },
     canChoosePick: (state) => {
       if (state.PickDays) {
+        let count = 1;
         state.PickDays.forEach((element: any) => {
           if (element) {
             if (element.length !== 0) {
-              state.canPickMonth.push({
-                month: element[0].month,
-                keyNum: element[0].month,
-              });
+              if (count === 1) {
+                state.canPickMonth.push({
+                  month: element[0].month,
+                  keyNum: element[0].month,
+                  select: true,
+                });
+                count++;
+              } else {
+                state.canPickMonth.push({
+                  month: element[0].month,
+                  keyNum: element[0].month,
+                  select: false,
+                });
+              }
             }
           }
         });
@@ -163,6 +192,7 @@ export const timetableSlice = createSlice({
               day: state.teamMonth[preMonth][i].day,
               week: state.presentWeek,
               month: state.teamMonth[preMonth][i].month,
+              back_color: 'white',
             });
           }
         }
@@ -358,13 +388,13 @@ export const {
   clonePickDays,
   addUseMonth,
   changeWeekColor,
-  clickLastMonth,
-  clickNextMonth,
+  addUseInDay,
   canChoosePick,
   clickWeek,
   searchMinWeek,
   clickMonth,
   // clickWeek2,
+  cloneInDates,
 } = timetableSlice.actions;
 
 export default timetableSlice.reducer;
