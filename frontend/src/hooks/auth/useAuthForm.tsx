@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FunctionComponent } from 'react';
 import styled from 'styled-components';
 import Button from '../../lib/styles/Button';
 import { changeField, initialForm, register, login } from '../../modules/auth';
@@ -6,7 +6,8 @@ import { setInitialDate } from '../../modules/calendar';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../modules';
 import type { IdPw } from '../../modules/auth';
-import { Link } from 'react-router-dom';
+
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import {
   clonePickDays,
@@ -14,12 +15,16 @@ import {
   canChoosePick,
 } from '../../modules/timetable';
 import { cloneDays } from '../../modules/individual';
+import { isFSA } from '@reduxjs/toolkit/dist/createAction';
+import { cloneUrl, makingNew } from '../../modules/teamtime';
 interface Props {
   type: string;
 }
-
-export function useAuthForm() {
-  const { id, pw, form, PickDays, response, url } = useSelector(
+interface MatchParams {
+  url: string; // params
+}
+export const useAuthForm = ({ history, match }: any) => {
+  const { id, pw, form, PickDays, response, url, Authorization } = useSelector(
     (state: RootState) => ({
       id: state.auth.id,
       pw: state.auth.pw,
@@ -27,10 +32,12 @@ export function useAuthForm() {
       PickDays: state.calendar.PickDays,
       response: state.calendar.response,
       url: state.calendar.url,
+      Authorization: state.auth.Authorization,
     })
   );
   const dispatch = useDispatch();
   const [check, onChangeCheck] = useState(false);
+  const myurl = match.params;
   useEffect(() => {
     dispatch(initialForm());
     dispatch(setInitialDate());
@@ -39,13 +46,22 @@ export function useAuthForm() {
     dispatch(addUseMonth());
     dispatch(canChoosePick());
   }, [dispatch]);
+  useEffect(() => {
+    if (Authorization) {
+      console.log('로그인 성공');
+      history.push('/timetable');
+    }
+  });
   const onSubmit = (e: any) => {
     e.preventDefault();
     const user: IdPw = {
       id: id,
       pw: pw,
-      url: url,
+      url: myurl.url !== undefined ? myurl.url : url,
     };
+    console.log(myurl);
+    myurl && dispatch(makingNew());
+    myurl && dispatch(cloneUrl(myurl.url));
     check && dispatch(register(user));
     !check && dispatch(login(user));
   };
@@ -54,7 +70,7 @@ export function useAuthForm() {
     dispatch(changeField({ key: name, value: value }));
   };
   return { onChange, id, pw, onSubmit, onChangeCheck, response };
-}
+};
 
 const AuthFormBlock = styled.div`
   display: block;
@@ -113,15 +129,23 @@ const Footer = styled.div`
   color: white;
 `;
 
-export default function AuthForm({ type }: Props) {
-  const { onChange, id, pw, onSubmit, onChangeCheck, response } = useAuthForm();
+const AuthForm = ({
+  history,
+  match,
+  type,
+}: RouteComponentProps<MatchParams> & Props) => {
+  const { onChange, id, pw, onSubmit, onChangeCheck, response } = useAuthForm({
+    history,
+    match,
+  });
+  const url = match.params;
   useEffect(() => {
     if (type === 'register') {
       onChangeCheck(true);
     } else {
       onChangeCheck(false);
     }
-  }, [type]);
+  }, [onChangeCheck, type]);
   return (
     <AuthFormBlock>
       {response.private_pages &&
@@ -145,25 +169,25 @@ export default function AuthForm({ type }: Props) {
         <LoginOrRegister>
           {type === 'register' && (
             <LoginOrRegister>
-              <Link to="/login">로그인</Link>
+              {url.url !== undefined ? (
+                <Link to={`/login/${url.url}`}>로그인</Link>
+              ) : (
+                <Link to="/login">로그인</Link>
+              )}
             </LoginOrRegister>
           )}
           {type === 'login' && (
             <LoginOrRegister>
-              <Link to="/register">회원가입</Link>
+              {url.url !== undefined ? (
+                <Link to={`/register/${url.url}`}>회원가입</Link>
+              ) : (
+                <Link to="/register">회원가입</Link>
+              )}
             </LoginOrRegister>
           )}
         </LoginOrRegister>
-        {type === 'register' && (
-          <Button middlewidth="true" to="/timetable">
-            회원가입
-          </Button>
-        )}
-        {type === 'login' && (
-          <Button middewidth="true" to="/timetable">
-            로그인
-          </Button>
-        )}
+        {type === 'register' && <Button middlewidth="true">회원가입</Button>}
+        {type === 'login' && <Button middlewidth="true">로그인</Button>}
       </form>
 
       <Footer>
@@ -172,4 +196,6 @@ export default function AuthForm({ type }: Props) {
       </Footer>
     </AuthFormBlock>
   );
-}
+};
+
+export default withRouter(AuthForm);
