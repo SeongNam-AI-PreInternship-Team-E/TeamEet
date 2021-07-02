@@ -12,6 +12,11 @@ export type User = {
   auth: [];
   authError: [];
   url: string;
+  Authorization: string;
+  calendar_dates: any;
+  makingNew: boolean;
+  start_time: number;
+  end_time: number;
 };
 
 type LoginOrPassword = {
@@ -30,8 +35,8 @@ const LOGIN = 'auth/LOGIN';
 export const register = createAction(REGISTER, (user: IdPw) => user);
 export const login = createAction(LOGIN, (user: IdPw) => user);
 
-const registerSaga = createRequestSaga(register, api.register);
-const loginSaga = createRequestSaga(login, api.login);
+const registerSaga = createRequestSaga(REGISTER, api.register);
+const loginSaga = createRequestSaga(LOGIN, api.login);
 
 export function* authSaga() {
   yield takeLatest(REGISTER, registerSaga);
@@ -50,12 +55,20 @@ const initialState: User = {
   },
   auth: [],
   authError: [],
+  Authorization: '',
+  calendar_dates: [],
+  makingNew: true,
+  start_time: 0,
+  end_time: 0,
 };
 
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    makingNew: (state) => {
+      state.makingNew = false;
+    },
     changeField: (state, action: PayloadAction<LoginOrPassword>) => {
       if (action.payload.key === 'username') state.id = action.payload.value;
       else state.pw = action.payload.value;
@@ -75,6 +88,10 @@ export const authSlice = createSlice({
     REGISTER_SUCCESS: (state, action: PayloadAction<any>) => {
       state.auth = action.payload;
       state.authError = [];
+      state.Authorization = action.payload.token;
+      state.calendar_dates = action.payload.calendar_dates;
+      state.start_time = Number(action.payload.private_pages[0].min_time);
+      state.end_time = Number(action.payload.private_pages[0].max_time);
     },
     REGISTER_FAILURE: (state, action: PayloadAction<any>) => {
       state.authError = action.payload;
@@ -83,6 +100,10 @@ export const authSlice = createSlice({
     LOGIN_SUCCESS: (state, action: PayloadAction<any>) => {
       state.auth = action.payload;
       state.authError = [];
+      state.Authorization = action.payload.token;
+      state.calendar_dates = action.payload.calendar_dates;
+      state.start_time = Number(action.payload.private_pages[0].min_time);
+      state.end_time = Number(action.payload.private_pages[0].max_time);
     },
     LOGIN_FAILURE: (state, action: PayloadAction<any>) => {
       state.authError = action.payload;

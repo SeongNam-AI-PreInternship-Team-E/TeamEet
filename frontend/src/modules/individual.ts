@@ -1,10 +1,27 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import lodash from 'lodash';
-
+import { createAction } from 'redux-actions';
+import createRequestSaga from '../hooks/createRequestSaga';
+import * as api from '../lib/api/indivisual';
+import { takeLatest } from 'redux-saga/effects';
 type changeDay = {
   check: boolean;
   day: number;
 };
+export type sendWeek = {
+  year: number;
+  month: number;
+  day: number;
+  time: number;
+  week: number;
+};
+
+export type individual = {
+  calendar_dates: sendWeek[];
+  url: string;
+  Authorization: string;
+};
+
 type initial = {
   PickWeek: any;
   PickTime: any;
@@ -16,13 +33,7 @@ type initial = {
   presentWeek: number;
   canPickWeek: any;
   change: changeDay;
-};
-
-type sendWeek = {
-  year: number;
-  month: number;
-  day: number;
-  time: number;
+  calendar_dates: sendWeek[];
 };
 
 const initialState: initial = {
@@ -36,10 +47,24 @@ const initialState: initial = {
   presentWeek: 1,
   canPickWeek: {},
   change: { check: false, day: 0 },
+  calendar_dates: [],
 };
 
+const TIMES = 'timeTable/TIMES';
+
+export const submitTimeInfo = createAction(
+  TIMES,
+  (individual: individual) => individual
+);
+
+const timeSaga = createRequestSaga(TIMES, api.sendTime);
+
+export function* individualSaga() {
+  yield takeLatest(TIMES, timeSaga);
+}
+
 export const individualSlice = createSlice({
-  name: 'TIMETABLE',
+  name: 'timeTable',
   initialState,
   reducers: {
     cloneWeek: (state, action: PayloadAction<any>) => {
@@ -66,6 +91,40 @@ export const individualSlice = createSlice({
     },
     clickIndividualMonth: (state, action: PayloadAction<any>) => {
       state.month = action.payload;
+    },
+    pushDates: (state) => {
+      state.calendar_dates = [];
+
+      for (let i = 1; i <= 7; i++) {
+        if (state.PickTime[i]) {
+          if (state.PickTime[i][0].trash === false) {
+            const selectDay = state.PickTime[i][0].day;
+
+            if (
+              state.IndividualTime[state.month] &&
+              state.IndividualTime[state.month][selectDay]
+            ) {
+              if (state.IndividualTime[state.month][selectDay].length !== 0) {
+                for (
+                  let j = 0;
+                  j < state.IndividualTime[state.month][selectDay].length;
+                  j++
+                ) {
+                  const { day, time, week } =
+                    state.IndividualTime[state.month][selectDay][j];
+                  state.calendar_dates.push({
+                    year: 2021,
+                    day: day,
+                    time: time,
+                    week: week,
+                    month: state.month,
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
     },
     addTimes: (state) => {
       const number = (state.endHour - state.startHour) * 2;
@@ -128,6 +187,7 @@ export const individualSlice = createSlice({
                           state.PickWeek[h].month === state.month;
                         if (find) {
                           let m = 0;
+                          state.PickWeek[h].back_color = '#98A2FF';
                           for (
                             let l = state.startHour;
                             l <= state.endHour;
@@ -141,6 +201,7 @@ export const individualSlice = createSlice({
                                 isWeekend: true,
                                 keeNum: m,
                                 color: 'white',
+                                trash: false,
                               });
                               m++;
                             }
@@ -216,6 +277,7 @@ export const individualSlice = createSlice({
                   day,
                   time,
                   index: 0,
+                  week: state.presentWeek,
                 });
                 state.change.check = true;
                 state.change.day = day;
@@ -225,6 +287,7 @@ export const individualSlice = createSlice({
                   day,
                   time,
                   index,
+                  week: state.presentWeek,
                 });
                 state.change.check = true;
                 state.change.day = day;
@@ -237,6 +300,7 @@ export const individualSlice = createSlice({
                   day,
                   time,
                   index: 0,
+                  week: state.presentWeek,
                 });
                 state.change.check = true;
                 state.change.day = day;
@@ -246,6 +310,7 @@ export const individualSlice = createSlice({
                   day,
                   time,
                   index,
+                  week: state.presentWeek,
                 });
                 state.change.check = true;
                 state.change.day = day;
@@ -300,6 +365,7 @@ export const individualSlice = createSlice({
                   day,
                   time,
                   index: 0,
+                  week: state.presentWeek,
                 });
               } else {
                 let index = state.IndividualTime[state.month][day].length;
@@ -307,6 +373,7 @@ export const individualSlice = createSlice({
                   day,
                   time,
                   index,
+                  week: state.presentWeek,
                 });
               }
             } else {
@@ -317,6 +384,7 @@ export const individualSlice = createSlice({
                   day,
                   time,
                   index: 0,
+                  week: state.presentWeek,
                 });
               } else {
                 let index = state.IndividualTime[state.month][day].length;
@@ -324,6 +392,7 @@ export const individualSlice = createSlice({
                   day,
                   time,
                   index,
+                  week: state.presentWeek,
                 });
               }
             }
@@ -405,6 +474,7 @@ export const {
   prevMonth,
   clickIndividualMonth,
   clonePresentWeek,
+  pushDates,
 } = individualSlice.actions;
 
 export default individualSlice.reducer;

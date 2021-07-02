@@ -2,36 +2,21 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../modules';
 import styled, { css } from 'styled-components';
-import { InPresent } from './InPresent';
+import { TeamPresent } from './TeamPresent';
 import { useDispatch } from 'react-redux';
-import { clickIndividualTime, dragTimes } from '../../modules/individual';
 import { useEffect } from 'react';
 import { cloneDates } from '../../modules/teamtime';
-import Button from '../../lib/styles/Button';
 
 export const useIndividual = () => {
-  const { PickWeek, PickTime, calendar_dates } = useSelector(
-    (state: RootState) => ({
-      PickWeek: state.individual.PickWeek,
-      PickTime: state.individual.PickTime,
-      calendar_dates: state.auth.calendar_dates,
-    })
-  );
-  const [isDown, onChangeDown] = useState({
-    drag: false,
-    key: 9999,
-  });
-  useEffect(() => {
-    dispatch(cloneDates(calendar_dates));
-  }, [calendar_dates]);
+  const { PickWeek, PickTime, response } = useSelector((state: RootState) => ({
+    PickWeek: state.teamtime.PickWeek,
+    PickTime: state.teamtime.PickTime,
+    response: state.teamtime.response,
+  }));
+
   const dispatch = useDispatch();
-  const onClickDrag = (time: number, day: number) => {
-    dispatch(dragTimes({ time, day }));
-  };
-  const onClickTime = (time: number, day: number) => {
-    dispatch(clickIndividualTime({ time, day }));
-  };
-  return { PickWeek, PickTime, onClickDrag, isDown, onChangeDown, onClickTime };
+
+  return { PickWeek, PickTime, response };
 };
 
 const TimeTableWrapper = styled.div`
@@ -50,7 +35,7 @@ const TimeTableContainer = styled.div`
 
 const Time = styled.div`
   display: grid;
-  max-height: 30rem;
+
   grid-template-columns: repeat(8, 1fr);
   box-sizing: border-box;
   text-align: center;
@@ -61,10 +46,10 @@ const DayOfWeek = styled.div<{ back_color: string }>`
   font-size: 1.2rem;
   font-weight: bolder;
   box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.25);
-  :nth-child(1) {
+  /* :nth-child(1) {
     box-shadow: none;
     color: white;
-  }
+  } */
   :nth-child(2) {
     color: red;
   }
@@ -80,15 +65,11 @@ const DayOfWeek = styled.div<{ back_color: string }>`
           opacity: 0.5;
         `}
 `;
-export default function Individual() {
-  const { PickWeek, PickTime, onClickDrag, isDown, onChangeDown, onClickTime } =
-    useIndividual();
+export default function TeamTimeTable() {
+  const { PickWeek, PickTime, response } = useIndividual();
   return (
     <TimeTableWrapper>
       <TimeTableContainer>
-        <Button to="/teamTable" middlewdith="true" cyan>
-          팀 시간표로
-        </Button>
         <Time>
           {PickWeek.map((day: any) => (
             <DayOfWeek key={day.day} back_color={day.back_color}>
@@ -96,16 +77,10 @@ export default function Individual() {
             </DayOfWeek>
           ))}
 
-          {PickTime.map((time: any, index: number) => (
-            <InPresent
-              isDown={isDown}
-              onChangeDown={onChangeDown}
-              onClickDrag={onClickDrag}
-              time={time}
-              key={index}
-              onClickTime={onClickTime}
-            ></InPresent>
-          ))}
+          {PickTime[1] &&
+            PickTime.map((time: any, index: number) => (
+              <TeamPresent time={time} key={index}></TeamPresent>
+            ))}
         </Time>
       </TimeTableContainer>
     </TimeTableWrapper>

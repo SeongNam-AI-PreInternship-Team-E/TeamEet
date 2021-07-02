@@ -288,17 +288,20 @@ export const daysSlice = createSlice({
       state.info.page.max_time = state.end_hour;
     },
     addUseDaysCal: (state) => {
-      if (state.PickDays[7]) {
-        for (let i = 0; i < state.PickDays[7].length; i++) {
-          const { day, month, weekOfDay, year } = state.PickDays[7][i];
-          state.info.solve.push({
-            day: day,
-            month: month,
-            day_of_week: weekOfDay,
-            year: year,
-          });
+      if (state.PickDays)
+        for (let j = 0; j < state.PickDays.length; j++) {
+          if (state.PickDays[j]) {
+            for (let i = 0; i < state.PickDays[j].length; i++) {
+              const { day, month, weekOfDay, year, key } = state.PickDays[j][i];
+              state.info.solve.push({
+                day: day,
+                month: month,
+                day_of_week: key,
+                year: year,
+              });
+            }
+          }
         }
-      }
     },
   },
 });

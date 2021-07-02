@@ -1,11 +1,17 @@
 import client from './client';
-
-export const sendTime = (info: any) => {
+import type { individual } from '../../modules/individual';
+export const sendTime = ({
+  url,
+  calendar_dates,
+  Authorization,
+}: individual) => {
+  const headers = {
+    'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    Authorization: `${Authorization}`,
+    Accept: '*/*',
+  };
   const dates = JSON.stringify({
-    year: info.year,
-    month: info.month,
-    day: info.day,
-    time: info.time,
+    calendar_dates: calendar_dates,
   });
-  return client.post(`/pages/${info.url}/register/`, dates);
+  return client.post(`/pages/${url}/register/`, dates, { headers });
 };
