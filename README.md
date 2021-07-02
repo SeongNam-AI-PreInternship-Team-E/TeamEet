@@ -1,6 +1,6 @@
 # TeamEet
 
-## 설명
+## **Description**
 
 ---
 
@@ -11,25 +11,51 @@ HTTP API 방식으로 JSON을 결과값으로 출력합니다.
 
 [Software Design DoC 및 개발 일지](https://www.notion.so/SW-Design-DOC-0d2c078c9efa4698bb48d5a31a3abc8b)  
 [API 문서화](https://documenter.getpostman.com/view/13993198/TzedgQAx)
+
 <br>
 
-## **아키텍처**
+## **Front-End**
 
-![ex_screenshot](./img/architecture.png)
+<img src="./img/Front-End.png">
+
+<br>
+<br>
+
+## **System Architecture**
+
+<img src="./img/architecture.png">
+
+<br>
+<br>
+
+## **Detailed Info**
+
+|       Name        |     Port      | Description                                                                                                                                                   |
+| :---------------: | :-----------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+|       Nginx       |      80       | 가벼움과 높은 성능을 목표로 하는 웹서버로 서버로서의 역할과 프록시로서의 역할을 수행합니다.                                                                   |
+|  React(on Nginx)  |      80       | 서버로부터 웹 페이지 및 그룹 멤버의 일정의 정보를 조회해 렌더링합니다.                                                                                        |
+| Django + Gunicorn |     8000      | 일정 공유 서비스의 서버입니다.                                                                                                                                |
+|    Amazon RDS     |     3306      | Database                                                                                                                                                      |
+|     Lightsail     | 52.79.248.172 | http://52.79.248.172:8000/                                                                                                                                    |
+|       Redux       |       -       | 프런트 내부의 전역적인 상태관리를 하게 해주는 라이브러리. 로그인, 회원가입, 개인별 달력 및 시간표, 팀별 달력 및 시간표의 상태들을 전역적으로 관리하게 해준다. |
+|    Redux-saga     |       -       | 특정 액션이 발생하면 이에 따라 특정 작업을 하는 방식으로 사용. 시간표의 시간들이 변경점을 가질 때 가장 마지막의 상태를 api를 요청해주는 역할을 수행           |
+|      Docker       |       -       | 리눅스의 응용 프로그램들을 프로세스 격리 기술들을 사용해 컨테이너로 실행하고 관리합니다.                                                                      |
+
+<br>
 
 ## **Database Modeling**
-<img width="701" alt="스크린샷 2021-07-01 오후 8 37 34" src="https://user-images.githubusercontent.com/84854251/124118498-5f1e8d80-daac-11eb-94cc-c4bcb509448b.png">
 
-## **팀원소개**
+<img src="./img/ERD.png">
 
-| 이름 | 개발분야 | 담당 |
-|:---:|:---:|:---:|
-|박근우|Back-end|API Design,ERD modeling, Cloud|
-|김다빈|Back-end|Cloud|
-|김청환|Back-end|Database Design|
-|장동현|Front-end|Web development|
-|김유신|Front-end|Web development|
+## **Members**
 
+|  이름  | 개발분야  |              담당              |
+| :----: | :-------: | :----------------------------: |
+| 박근우 | Back-end  | API Design,ERD modeling, Cloud |
+| 김다빈 | Back-end  |             Cloud              |
+| 김청환 | Back-end  |        Database Design         |
+| 장동현 | Front-end |        Web development         |
+| 김유신 | Front-end |        Web development         |
 
 <br>
 
