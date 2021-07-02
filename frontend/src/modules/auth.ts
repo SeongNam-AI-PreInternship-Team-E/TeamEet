@@ -11,7 +11,7 @@ export type User = {
   form: string;
   auth: [];
   authError: [];
-  url: string;
+  url2: string;
   Authorization: string;
   calendar_dates: any;
   makingNew: boolean;
@@ -46,7 +46,7 @@ export function* authSaga() {
 const initialState: User = {
   id: '',
   pw: '',
-  url: '',
+  url2: '',
   form: 'register',
   register: {
     id: '',
@@ -76,7 +76,7 @@ export const authSlice = createSlice({
     initialForm: (state) => {
       state.id = '';
       state.pw = '';
-      state.url = '';
+      state.url2 = '';
       state.register = {
         id: '',
         pw: '',
@@ -92,6 +92,7 @@ export const authSlice = createSlice({
       state.calendar_dates = action.payload.calendar_dates;
       state.start_time = Number(action.payload.private_pages[0].min_time);
       state.end_time = Number(action.payload.private_pages[0].max_time);
+      state.url2 = action.payload.private_pages[0].url;
     },
     REGISTER_FAILURE: (state, action: PayloadAction<any>) => {
       state.authError = action.payload;
@@ -104,6 +105,7 @@ export const authSlice = createSlice({
       state.calendar_dates = action.payload.calendar_dates;
       state.start_time = Number(action.payload.private_pages[0].min_time);
       state.end_time = Number(action.payload.private_pages[0].max_time);
+      state.url2 = action.payload.private_pages[0].url;
     },
     LOGIN_FAILURE: (state, action: PayloadAction<any>) => {
       state.authError = action.payload;
