@@ -245,6 +245,7 @@ const DayBox = styled.div<{
   background-color: ${(props) => props.color};
   color: ${(props) => props.text_color};
   opacity: ${(props) => props.opacity};
+
   box-sizing: border-box;
   ${(props) =>
     props.select &&
