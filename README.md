@@ -1,6 +1,6 @@
 # TeamEet
 
-## 설명
+## **Description**
 
 ---
 
@@ -21,7 +21,7 @@ HTTP API 방식으로 JSON을 결과값으로 출력합니다.
 <br>
 <br>
 
-## **아키텍처**
+## **System Architecture**
 
 <img src="./img/architecture.png">
 
@@ -47,7 +47,7 @@ HTTP API 방식으로 JSON을 결과값으로 출력합니다.
 
 <img src="./img/ERD.png">
 
-## **팀원소개**
+## **Members**
 
 |  이름  | 개발분야  |              담당              |
 | :----: | :-------: | :----------------------------: |
