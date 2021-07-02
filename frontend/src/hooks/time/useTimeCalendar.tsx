@@ -10,10 +10,9 @@ import {
   addUseMonth,
   canChoosePick,
   changeWeekColor,
-  clickLastMonth,
   clickMonth,
-  clickNextMonth,
   clickWeek,
+  cloneInDates,
   clonePickDays,
   searchMinWeek,
 } from '../../modules/timetable';
@@ -27,6 +26,8 @@ import {
   setTimeColor,
   clickIndividualMonth,
   clonePresentWeek,
+  pushDates,
+  submitTimeInfo,
 } from '../../modules/individual';
 import { setInitialDate } from '../../modules/calendar';
 
@@ -41,6 +42,10 @@ function useTimeCalendar() {
     canPickMonth,
     showSelect,
     presentWeek,
+    calendar_dates,
+    calendar_datess,
+    url,
+    Authorization,
   } = useSelector((state: RootState) => ({
     teamMonth: state.timetable.teamMonth,
     month: state.timetable.month,
@@ -51,6 +56,10 @@ function useTimeCalendar() {
     canPickMonth: state.timetable.canPickMonth,
     showSelect: state.timetable.showSelect,
     presentWeek: state.timetable.presentWeek,
+    calendar_dates: state.individual.calendar_dates,
+    calendar_datess: state.auth.calendar_dates,
+    url: state.calendar.url,
+    Authorization: state.auth.Authorization,
   }));
   const dispatch = useDispatch();
   // const [useMonth, onChangeUseMonth] = useState(canPickMonth[0].month);
@@ -63,7 +72,17 @@ function useTimeCalendar() {
     dispatch(addUseMonth());
     dispatch(searchMinWeek());
     dispatch(cloneWeek(PickWeek));
+    dispatch(pushDates());
     dispatch(addTimes());
+    if (calendar_dates.length !== 0) {
+      dispatch(
+        submitTimeInfo({
+          url: url,
+          calendar_dates: calendar_dates,
+          Authorization: Authorization,
+        })
+      );
+    }
     dispatch(addNormalTime());
     dispatch(setTimeColor());
     dispatch(clonePresentWeek(presentWeek));
@@ -74,38 +93,36 @@ function useTimeCalendar() {
     dispatch(changeWeekColor());
     dispatch(searchMinWeek());
     dispatch(clickWeek(showSelect));
-  }, [dispatch, showSelect]);
+    dispatch(cloneInDates(calendar_datess));
+  }, [dispatch, showSelect, calendar_datess]);
   useEffect(() => {
     onChangeWeek(showSelect);
   }, [dispatch, showSelect]);
-  const onClickNextWeek = () => {
-    dispatch(nextMonth());
-    dispatch(clickNextMonth());
-    dispatch(searchMinWeek());
-    dispatch(addUseMonth());
-    dispatch(changeWeekColor());
-    dispatch(clickWeek(showSelect));
-  };
-  const onClickPrevWeek = () => {
-    dispatch(prevMonth());
-    dispatch(clickLastMonth());
-    dispatch(searchMinWeek());
-    dispatch(addUseMonth());
-    dispatch(changeWeekColor());
-    dispatch(clickWeek(showSelect));
-  };
+
   const onChangeWeek = (week: number) => {
     dispatch(clickWeek(week));
     dispatch(changeWeekColor());
     dispatch(cloneWeek(PickWeek));
+    dispatch(pushDates());
     dispatch(addTimes());
     dispatch(addNormalTime());
+    // if (calendar_dates) {
+    //   dispatch(
+    //     submitTimeInfo({
+    //       url: url,
+    //       calendar_dates: calendar_dates,
+    //       Authorization: Authorization,
+    //     })
+    //   );
+    // }
   };
   const onClickWeek = (week: number) => {
     dispatch(clickMonth(week));
     dispatch(clonePresentWeek(week));
     dispatch(clickIndividualMonth(week));
+
     dispatch(searchMinWeek());
+
     dispatch(addUseMonth());
     dispatch(changeWeekColor());
     dispatch(clickWeek(showSelect));
@@ -115,8 +132,6 @@ function useTimeCalendar() {
     teamMonth,
     month,
     weekOfDay,
-    onClickNextWeek,
-    onClickPrevWeek,
     onChangeWeek,
     canPickWeek,
     onClickWeek,
@@ -244,14 +259,24 @@ const Cal = styled.div`
   }
 `;
 
-const Month = styled.div`
+const Month = styled.div<{ select: boolean }>`
   cursor: pointer;
-  width: 10%;
+  min-width: 1rem;
+  min-height: 1rem;
   margin-left: 1rem;
+  padding: 1rem;
   margin-right: 1rem;
   border: 1px solid black;
   display: flex;
   justify-content: center;
+  ${(props) =>
+    props.select
+      ? css`
+          background-color: #5465ff;
+        `
+      : css`
+          opacity: 0.5;
+        `}
 `;
 
 const DayOfWeek = styled.div`
@@ -310,8 +335,6 @@ export default function TimeCalendar() {
     teamMonth,
     month,
     weekOfDay,
-    onClickNextWeek,
-    onClickPrevWeek,
     onChangeWeek,
     canPickWeek,
     onClickWeek,
@@ -320,36 +343,13 @@ export default function TimeCalendar() {
   return (
     <CalendarWrapper>
       <CalendarContainer>
-        {/* <TitleContainer>
-      <h5 />
-      <h4 />
-      <h4 />
-      <Title
-        placeholder="모임명을 입력 하세요"
-        onChange={(e) => {
-          onChangeTitle(e.target.value);
-        }}
-      ></Title>
-      <h4 />
-      <h5 />
-      <ButtonClick cyan onClick={onNextClick}>
-        <div>생성</div>
-      </ButtonClick>
-    </TitleContainer> */}
         <Header>
-          <AiFillCaretLeft
-            onClick={onClickPrevWeek}
-            style={{ cursor: 'pointer' }}
-          ></AiFillCaretLeft>
           {month.locale('en').format('MMM')}
           &nbsp;
           {month.format('MM')}
-          <AiFillCaretRight
-            onClick={onClickNextWeek}
-            style={{ cursor: 'pointer' }}
-          ></AiFillCaretRight>
           {canPickMonth.map((month: any) => (
             <Month
+              select={month.select}
               onClick={() => {
                 onClickWeek(month.month);
               }}
