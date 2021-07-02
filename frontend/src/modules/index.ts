@@ -7,7 +7,8 @@ import user, { userSaga } from './user';
 import auth, { authSaga } from './auth';
 import timetable from './timetable';
 import time from './time';
-import individual from './individual';
+import individual, { individualSaga } from './individual';
+import teamtime, { teamSaga } from './teamtime';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import storageSession from 'redux-persist/lib/storage/session';
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
   time,
   timetable,
   individual,
+  teamtime,
 });
 
 export default persistReducer(persistConfig, rootReducer);
@@ -34,5 +36,12 @@ export default persistReducer(persistConfig, rootReducer);
 export type RootState = ReturnType<typeof rootReducer>;
 
 export function* rootSaga() {
-  yield all([sampleSaga(), userSaga(), authSaga(), calendarSaga()]);
+  yield all([
+    sampleSaga(),
+    userSaga(),
+    authSaga(),
+    calendarSaga(),
+    individualSaga(),
+    teamSaga(),
+  ]);
 }
