@@ -30,11 +30,9 @@ function loadUser() {
 sagaMiddleware.run(rootSaga);
 ReactDOM.render(
   <Provider store={store}>
-    <PersistGate loading={true} persistor={persistor}>
-      <HashRouter>
-        <App />
-      </HashRouter>
-    </PersistGate>
+    <HashRouter>
+      <App />
+    </HashRouter>
   </Provider>,
   document.getElementById('root')
 );

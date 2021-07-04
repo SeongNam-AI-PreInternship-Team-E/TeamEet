@@ -1,5 +1,6 @@
 {
   "files": {
+
     "main.css": "/static/css/main.499642c6.chunk.css",
     "main.js": "/static/js/main.c54a709c.chunk.js",
     "main.js.map": "/static/js/main.c54a709c.chunk.js.map",
@@ -20,5 +21,6 @@
     "static/js/2.660595e7.chunk.js",
     "static/css/main.499642c6.chunk.css",
     "static/js/main.c54a709c.chunk.js"
+
   ]
 }

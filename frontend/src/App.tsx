@@ -8,12 +8,11 @@ type Props = {};
 const App = (props: Props) => {
   return (
     <>
-      {console.log(fetch)}
-      <Route component={CalendarPage} path="/" exact />
+      <Route component={CalendarPage} path={'/'} exact />
       <Route component={AuthPage} path={['/register/:url', '/register']} />
       <Route component={LoginPage} path={['/login/:url', '/login']} />
-      <Route component={TimeTablePage} path="/timetable" />
-      <Route component={TeamTablePage} path="/teamTable" />
+      <Route component={TimeTablePage} path={'/timetable'} />
+      <Route component={TeamTablePage} path={'/teamTable'} />
     </>
   );
 };
