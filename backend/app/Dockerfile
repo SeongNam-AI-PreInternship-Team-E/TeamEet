@@ -40,7 +40,9 @@ RUN pip3 install -r requirements.txt
 # RUN pip install mysqlclient
 
 EXPOSE 8000
+
 #COPY . .
 
 # CMD tail -f /dev/null
-CMD [ "python3", "manage.py", "runserver", "0.0.0.0:8000" ]
+# CMD [ "python3", "manage.py", "runserver", "0.0.0.0:8000" ]
+CMD [ "gunicorn", "app.wsgi:application", "--bind", "0.0.0.0"]
