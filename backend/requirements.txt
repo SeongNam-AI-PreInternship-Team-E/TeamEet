@@ -50,3 +50,4 @@ requests==2.25.1
 sqlparse==0.4.1
 toml==0.10.2
 urllib3==1.26.5
+django-cors-headers
