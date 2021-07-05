@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'pages'
+    'pages',
+    'corsheaders'
 ]
 # API 호출을 할 때 Web UI 와 JSON 형식 두가지로 보이는데 JSON 형식으로만 보이도록 옵션 설정
 # REST_FRAMEWORK = {
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
 # }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -61,6 +63,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+# CORS 관련 추가
+CORS_ORIGIN_WHITELIST = ['http://www.himyteamnew.ml/', 'http://himyteamnew.ml/']
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'app.urls'
 
