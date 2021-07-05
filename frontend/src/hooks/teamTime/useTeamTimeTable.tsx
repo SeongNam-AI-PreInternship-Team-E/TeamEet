@@ -19,7 +19,7 @@ export const useIndividual = () => {
       id: state.auth.id,
     })
   );
-  const textInput = useRef(`http://localhost:3000/#/register/${url2}`);
+  const textInput = useRef(`http://www.himyteamnew.ml/#/register/${url2}`);
 
   const url = window.location.href;
   const dispatch = useDispatch();
