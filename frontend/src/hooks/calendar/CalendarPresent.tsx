@@ -1,7 +1,7 @@
-import React from 'react';
-import type { Days } from '../../modules/calendar';
-import styled, { css } from 'styled-components';
-import { dragMonth } from '../../modules/calendar';
+import React from "react";
+import type { Days } from "../../modules/calendar";
+import styled, { css } from "styled-components";
+import { dragMonth } from "../../modules/calendar";
 interface Props {
   day: Days;
   onClickDrag: (id: number) => void;
@@ -11,6 +11,7 @@ interface Props {
 }
 
 const DayBox = styled.div`
+  font-family: "Noto Sans KR", "-apple-system ", sans-serif;
   cursor: pointer;
   box-sizing: border-box;
   width: 100%;
@@ -48,11 +49,11 @@ function CalendarPresent({
         day.present
           ? {
               opacity: 1,
-              cursor: 'pointer',
+              cursor: "pointer",
               backgroundColor: `${day.color}`,
               color: `${day.text_color}`,
             }
-          : { opacity: 0.3, cursor: 'not-allowed' }
+          : { opacity: 0.3, cursor: "not-allowed" }
       }
     >
       {day.day}
