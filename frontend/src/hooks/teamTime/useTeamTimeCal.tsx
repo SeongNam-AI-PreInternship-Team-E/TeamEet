@@ -1,11 +1,11 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../modules';
-import Button from '../../lib/styles/Button';
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../modules";
+import Button from "../../lib/styles/Button";
 
-import styled, { css } from 'styled-components';
-import TeamCalendarPresent from './TeamCalendarPresent';
-import { useEffect, useState } from 'react';
-import qs from 'qs';
+import styled, { css } from "styled-components";
+import TeamCalendarPresent from "./TeamCalendarPresent";
+import { useEffect, useState } from "react";
+import qs from "qs";
 
 import {
   addTeamMonth,
@@ -16,8 +16,8 @@ import {
   addTimes,
   pushData,
   changeColor,
-} from '../../modules/teamtime';
-import { changeWeekColor } from '../../modules/teamtime';
+} from "../../modules/teamtime";
+import { changeWeekColor } from "../../modules/teamtime";
 
 function useTimeCalendar() {
   const {
@@ -75,10 +75,18 @@ function useTimeCalendar() {
 }
 
 const CalendarWrapper = styled.div`
+  font-family: "Noto Sans KR", "-apple-system ", sans-serif;
   display: flex;
   width: 40%;
   height: 80%;
   padding: 1rem;
+
+  /* 시간표, 달력 세로 배치 시 중앙정렬 */
+  @media (max-width: 1040px) {
+    width: 50%;
+    position: relative;
+    left: 4rem;
+  }
 `;
 
 const TitleContainer = styled.div`
@@ -133,6 +141,8 @@ const ButtonClick = styled(Button)`
   width: 10%;
   min-width: 4rem;
   justify-content: center;
+  position: absolute;
+  left: 50%;
 `;
 
 const CalendarContainer = styled.div`
@@ -273,9 +283,9 @@ export default function TeamTimeCal() {
     <CalendarWrapper>
       <CalendarContainer>
         <Header>
-          {month.locale('en').format('MMM')}
+          {month.locale("en").format("MMM")}
           &nbsp;
-          {month.format('MM')}
+          {month.format("MM")}
           {/* {canPickMonth.map((month: any) => (
             <Month
               select={month.select}
@@ -294,11 +304,11 @@ export default function TeamTimeCal() {
             weekOfDay.map((week: any) => (
               <DayOfWeek
                 style={
-                  week === 'Sa'
-                    ? { color: 'blue' }
-                    : week === 'Su'
-                    ? { color: 'red' }
-                    : { color: 'black' }
+                  week === "Sa"
+                    ? { color: "blue" }
+                    : week === "Su"
+                    ? { color: "red" }
+                    : { color: "black" }
                 }
                 key={week}
               >

@@ -1,22 +1,22 @@
-import React, { useState, useEffect, FunctionComponent } from 'react';
-import styled from 'styled-components';
-import Button from '../../lib/styles/Button';
-import { changeField, initialForm, register, login } from '../../modules/auth';
-import { setInitialDate } from '../../modules/calendar';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../modules';
-import type { IdPw } from '../../modules/auth';
+import React, { useState, useEffect, FunctionComponent } from "react";
+import styled from "styled-components";
+import Button from "../../lib/styles/Button";
+import { changeField, initialForm, register, login } from "../../modules/auth";
+import { setInitialDate } from "../../modules/calendar";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../modules";
+import type { IdPw } from "../../modules/auth";
 
-import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
+import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 
 import {
   clonePickDays,
   addUseMonth,
   canChoosePick,
-} from '../../modules/timetable';
-import { cloneDays } from '../../modules/individual';
-import { isFSA } from '@reduxjs/toolkit/dist/createAction';
-import { cloneUrl, makingNew } from '../../modules/teamtime';
+} from "../../modules/timetable";
+import { cloneDays } from "../../modules/individual";
+import { isFSA } from "@reduxjs/toolkit/dist/createAction";
+import { cloneUrl, makingNew } from "../../modules/teamtime";
 interface Props {
   type: string;
 }
@@ -48,8 +48,8 @@ export const useAuthForm = ({ history, match }: any) => {
   }, [dispatch]);
   useEffect(() => {
     if (Authorization) {
-      console.log('로그인 성공');
-      history.push('/timetable');
+      console.log("로그인 성공");
+      history.push("/timetable");
     }
   });
   const onSubmit = (e: any) => {
@@ -73,6 +73,7 @@ export const useAuthForm = ({ history, match }: any) => {
 };
 
 const AuthFormBlock = styled.div`
+  font-family: "Noto Sans KR", "-apple-system ", sans-serif;
   display: block;
 `;
 
@@ -89,6 +90,7 @@ const StyledInput = styled.input`
   padding-left: 0.5rem;
   background-color: transparent;
   color: white;
+  font-family: "Noto Sans KR-light", sans-serif;
   ::placeholder {
     padding-left: 0.5rem;
     color: white;
@@ -140,7 +142,7 @@ const AuthForm = ({
   });
   const url = match.params;
   useEffect(() => {
-    if (type === 'register') {
+    if (type === "register") {
       onChangeCheck(true);
     } else {
       onChangeCheck(false);
@@ -149,7 +151,7 @@ const AuthForm = ({
   return (
     <AuthFormBlock>
       {response.private_pages &&
-        console.log('url', response.private_pages[0].url)}
+        console.log("url", response.private_pages[0].url)}
       <form onSubmit={onSubmit}>
         <StyledInput
           autoComplete="username"
@@ -167,7 +169,7 @@ const AuthForm = ({
           value={pw}
         />
         <LoginOrRegister>
-          {type === 'register' && (
+          {type === "register" && (
             <LoginOrRegister>
               {url.url !== undefined ? (
                 <Link to={`/login/${url.url}`}>로그인</Link>
@@ -176,7 +178,7 @@ const AuthForm = ({
               )}
             </LoginOrRegister>
           )}
-          {type === 'login' && (
+          {type === "login" && (
             <LoginOrRegister>
               {url.url !== undefined ? (
                 <Link to={`/register/${url.url}`}>회원가입</Link>
@@ -186,8 +188,8 @@ const AuthForm = ({
             </LoginOrRegister>
           )}
         </LoginOrRegister>
-        {type === 'register' && <Button middlewidth="true">회원가입</Button>}
-        {type === 'login' && <Button middlewidth="true">로그인</Button>}
+        {type === "register" && <Button middleWidth="true">회원가입</Button>}
+        {type === "login" && <Button middleWidth="true">로그인</Button>}
       </form>
 
       <Footer>

@@ -1,14 +1,14 @@
-import React, { useState, useRef } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../modules';
-import styled, { css } from 'styled-components';
-import { TeamPresent } from './TeamPresent';
-import { useDispatch } from 'react-redux';
-import { useEffect } from 'react';
-import { cloneDates } from '../../modules/teamtime';
-import Button from '../../lib/styles/Button';
-import CopyToClipboard from './ClipboardCopy';
-import { cons } from 'fp-ts/lib/ReadonlyNonEmptyArray';
+import React, { useState, useRef } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../modules";
+import styled, { css } from "styled-components";
+import { TeamPresent } from "./TeamPresent";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { cloneDates } from "../../modules/teamtime";
+import Button from "../../lib/styles/Button";
+import CopyToClipboard from "./ClipboardCopy";
+import { cons } from "fp-ts/lib/ReadonlyNonEmptyArray";
 export const useIndividual = () => {
   const { PickWeek, PickTime, response, url2, id } = useSelector(
     (state: RootState) => ({
@@ -28,10 +28,17 @@ export const useIndividual = () => {
 };
 
 const TimeTableWrapper = styled.div`
+  font-family: "Noto Sans KR", "-apple-system ", sans-serif;
   display: flex;
   width: 60%;
   height: 100%;
   padding: 1rem;
+
+  @media (max-width: 1040px) {
+    width: 50%;
+    position: relative;
+    left: 4rem;
+  }
 `;
 
 const TimeTableContainer = styled.div`
@@ -66,7 +73,7 @@ const DayOfWeek = styled.div<{ back_color: string }>`
     color: blue;
   }
   ${(props) =>
-    props.back_color === '#98A2FF'
+    props.back_color === "#98A2FF"
       ? css`
           background-color: ${props.back_color};
         `

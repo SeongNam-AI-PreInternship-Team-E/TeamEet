@@ -1,11 +1,11 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../modules';
-import Button from '../../lib/styles/Button';
-import { AiFillCaretLeft, AiFillCaretRight } from 'react-icons/ai';
-import styled, { css } from 'styled-components';
-import TeamCalendarPresent from './TeamCalendarPresent';
-import { useEffect, useState } from 'react';
-import qs from 'qs';
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../modules";
+import Button from "../../lib/styles/Button";
+import { AiFillCaretLeft, AiFillCaretRight } from "react-icons/ai";
+import styled, { css } from "styled-components";
+import TeamCalendarPresent from "./TeamCalendarPresent";
+import { useEffect, useState } from "react";
+import qs from "qs";
 import {
   addUseInDay,
   addUseMonth,
@@ -16,7 +16,7 @@ import {
   cloneInDates,
   clonePickDays,
   searchMinWeek,
-} from '../../modules/timetable';
+} from "../../modules/timetable";
 import {
   addNormalTime,
   addTimes,
@@ -31,9 +31,9 @@ import {
   submitTimeInfo,
   cloneSever,
   addLoginTime,
-} from '../../modules/individual';
-import { setInitialDate } from '../../modules/calendar';
-import { cloneUrl } from '../../modules/teamtime';
+} from "../../modules/individual";
+import { setInitialDate } from "../../modules/calendar";
+import { cloneUrl } from "../../modules/teamtime";
 
 function useTimeCalendar() {
   const {
@@ -89,7 +89,7 @@ function useTimeCalendar() {
       dispatch(addUseInDay());
     }
     if (calendar_dates.length !== 0) {
-      url === ''
+      url === ""
         ? dispatch(
             submitTimeInfo({
               url: url2,
@@ -161,10 +161,18 @@ function useTimeCalendar() {
 }
 
 const CalendarWrapper = styled.div`
+  font-family: "Noto Sans KR", "-apple-system ", sans-serif;
   display: flex;
   width: 40%;
   height: 80%;
   padding: 1rem;
+
+  /* 시간표, 달력 세로 배치 시 중앙정렬 */
+  @media (max-width: 1040px) {
+    width: 50%;
+    position: relative;
+    left: 4rem;
+  }
 `;
 
 const TitleContainer = styled.div`
@@ -365,16 +373,16 @@ export default function TimeCalendar() {
     <CalendarWrapper>
       <CalendarContainer>
         <Header>
-          {month.locale('en').format('MMM')}
+          {month.locale("en").format("MMM")}
           &nbsp;
-          {month.format('MM')}
+          {month.format("MM")}
           {canPickMonth.map((month: any) => (
             <Month
               select={month.select}
               onClick={() => {
                 onClickWeek(month.month);
               }}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: "pointer" }}
               key={month.month}
             >
               {month.month}
@@ -386,11 +394,11 @@ export default function TimeCalendar() {
             weekOfDay.map((week: any) => (
               <DayOfWeek
                 style={
-                  week === 'Sa'
-                    ? { color: 'blue' }
-                    : week === 'Su'
-                    ? { color: 'red' }
-                    : { color: 'black' }
+                  week === "Sa"
+                    ? { color: "blue" }
+                    : week === "Su"
+                    ? { color: "red" }
+                    : { color: "black" }
                 }
                 key={week}
               >

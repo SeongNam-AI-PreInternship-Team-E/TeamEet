@@ -1,12 +1,12 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { AiFillCaretLeft, AiFillCaretRight } from 'react-icons/ai';
-import Button from '../../lib/styles/Button';
-import styled from 'styled-components';
-import dayjs from 'dayjs';
-import 'dayjs/plugin/timezone';
-import 'dayjs/locale/ko';
-import 'dayjs/plugin/utc';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState, useCallback, useEffect } from "react";
+import { AiFillCaretLeft, AiFillCaretRight } from "react-icons/ai";
+import Button from "../../lib/styles/Button";
+import styled from "styled-components";
+import dayjs from "dayjs";
+import "dayjs/plugin/timezone";
+import "dayjs/locale/ko";
+import "dayjs/plugin/utc";
+import { useSelector, useDispatch } from "react-redux";
 import {
   addDays,
   nextMonth,
@@ -16,13 +16,13 @@ import {
   setDay,
   setInitialDate,
   addTitle,
-} from '../../modules/calendar';
-import { RootState } from '../../modules';
+} from "../../modules/calendar";
+import { RootState } from "../../modules";
 
-import CalendarPresent from './CalendarPresent';
-import Modal, { useModal } from '../common/useModal';
-import { red } from '@material-ui/core/colors';
-import { executeReducerBuilderCallback } from '@reduxjs/toolkit/dist/mapBuilders';
+import CalendarPresent from "./CalendarPresent";
+import Modal, { useModal } from "../common/useModal";
+import { red } from "@material-ui/core/colors";
+import { executeReducerBuilderCallback } from "@reduxjs/toolkit/dist/mapBuilders";
 
 interface Props {}
 
@@ -38,13 +38,13 @@ export function useCalendar() {
     key: 99999,
   });
 
-  const timezone = require('dayjs/plugin/timezone');
-  const utc = require('dayjs/plugin/utc');
+  const timezone = require("dayjs/plugin/timezone");
+  const utc = require("dayjs/plugin/utc");
   dayjs.extend(utc);
   dayjs.extend(timezone);
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(setDay(dayjs().tz('Asia/Seoul').locale('ko')));
+    dispatch(setDay(dayjs().tz("Asia/Seoul").locale("ko")));
     dispatch(addDays());
     return () => {
       dispatch(setInitialDate());
@@ -110,6 +110,7 @@ const TitleContainer = styled.div`
 `;
 
 const Title = styled.input`
+  font-family: "Noto Sans KR", "-apple-system ", sans-serif;
   padding-top: 5rem;
   display: flex;
   width: 40%;
@@ -157,6 +158,7 @@ const CalendarContainer = styled.div`
 `;
 
 const Header = styled.div`
+  font-family: "Noto Sans KR", "-apple-system ", sans-serif;
   display: flex;
 
   margin-bottom: 1rem;
@@ -252,30 +254,30 @@ export const Calendar = (props: Props) => {
               onClick={() => {
                 onClickPrev();
               }}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: "pointer" }}
             ></AiFillCaretLeft>
-            {month.locale('en').format('MMM')}
+            {month.locale("en").format("MMM")}
             &nbsp;
-            {month.format('MM')}
+            {month.format("MM")}
             <AiFillCaretRight
               onClick={() => {
                 onClickNext();
               }}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: "pointer" }}
             ></AiFillCaretRight>
           </h3>
           <h4></h4>
-          <h2>{month.format('YYYY')}</h2>
+          <h2>{month.format("YYYY")}</h2>
         </Header>
         <Cal>
           {weekOfDay.map((week): any => (
             <DayOfWeek
               style={
-                week === 'Sa'
-                  ? { color: 'blue' }
-                  : week === 'Su'
-                  ? { color: 'red' }
-                  : { color: 'black' }
+                week === "Sa"
+                  ? { color: "blue" }
+                  : week === "Su"
+                  ? { color: "red" }
+                  : { color: "black" }
               }
               key={week}
             >
