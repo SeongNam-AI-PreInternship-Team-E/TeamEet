@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
-
+from .secret_key import SECRET_KEY
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,8 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = 'django-insecure-mp4m&^+r36$507ucoyibbown0(@%h@fxvjm%gtl@+4k6((w%cs'
-SECRET_KEY = os.environ.get(
-    'SECRET_KEY', 'django-insecure-mp4m&^+r36$507ucoyibbown0(@%h@fxvjm%gtl@+4k6((w%cs')
+SECRET_KEY = SECRET_KEY
 ALGORITHM = 'HS256'
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = False
@@ -64,7 +63,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 # CORS 관련 추가
-CORS_ORIGIN_WHITELIST = ['http://www.himyteamnew.ml/', 'http://himyteamnew.ml/']
+# CORS_ORIGIN_WHITELIST = ['http://www.himyteamnew.ml/', 'http://himyteamnew.ml/']
 CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'app.urls'
