@@ -22,23 +22,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = secret_key.SECRET_KEY
-ALGORITHM = os.environ.get("JWT_ALGORITHM")
+ALGORITHM = os.environ["JWT_ALGORITHM"]
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = False
-DEBUG = int(os.environ.get("DEBUG", default=1))
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
-    #Local_Apps
+    # Local_Apps
     'pages',
 
-    #Third_Party_Apps
+    # Third_Party_Apps
     'rest_framework',
     'corsheaders',
 
-    #Django_Apps
+    # Django_Apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
