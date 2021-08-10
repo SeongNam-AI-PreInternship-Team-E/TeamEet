@@ -16,10 +16,13 @@ import random
 
 import json
 import jwt  # 토큰 발행에 사용
-from app.settings import SECRET_KEY, ALGORITHM  # 토큰 발행에 사용할 secret key, algorithm
+from app import settings  # 토큰 발행에 사용할 secret key, algorithm
 from .utils import login_decorator
 
 from collections import defaultdict
+
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
 
 
 # 페이지 조회 및 생성
@@ -83,10 +86,9 @@ class SignUpView(View):
         except private_pages.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        if request.method == "GET":
-            query_set = group_members.objects.all()
-            serializer = GetMembersSerializer(query_set, many=True)
-            return JsonResponse(serializer.data, safe=False)
+        query_set = group_members.objects.all()
+        serializer = GetMembersSerializer(query_set, many=True)
+        return JsonResponse(serializer.data, safe=False)
 
     def post(self, request, url):
         try:
@@ -111,17 +113,14 @@ class SignUpView(View):
             if group_members.objects.filter(name=data['name'], private_page_id=private_page_id).exists():
                 user = group_members.objects.get(
                     name=data['name'], private_page_id=private_page_id)
-                print('비밀번호 확인 앞')
                 #---------비밀번호 확인--------#
                 if data['password'] == user.password:
-                    print('비밀번호 확인 뒤')
                     dates_info = list(
                         calendar_dates.objects.filter(private_page_id=page_serializer.data['id']).values())
                     dates_month_info = [
                         date['month'] for date in dates_info]
                     dates_month_info = sorted(list(set(dates_month_info)))
                     #----------토큰 발행----------#
-
                     token = jwt.encode(
                         {'name': data['name'], 'private_page_id': private_page_id}, SECRET_KEY, ALGORITHM)
                     #-----------------------------#
@@ -176,10 +175,8 @@ class SignInView(View):
             if group_members.objects.filter(name=data['name'], private_page_id=private_page_id).exists():
                 user = group_members.objects.get(
                     name=data['name'], private_page_id=private_page_id)
-                print('비밀번호 확인 앞')
                 #---------비밀번호 확인--------#
                 if data['password'] == user.password:
-                    print('비밀번호 확인 뒤')
                     dates_info = list(
                         calendar_dates.objects.filter(private_page_id=page_serializer.data['id']).values())
                     dates_month_info = [
