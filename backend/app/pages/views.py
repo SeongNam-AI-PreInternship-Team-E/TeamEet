@@ -46,12 +46,6 @@ class PagesView(View):
                 string.ascii_letters) for _ in range(length_of_string))
             url = str(1) + '-' + secure_code
 
-        # # 고유한 url 형식:id-secure_code
-        # length_of_string = 5
-        # secure_code = ''.join(random.choice(
-        #     string.ascii_letters) for _ in range(length_of_string))
-        # url = str(page.id+1) + '-' + secure_code
-
         private_pages.objects.create(
             url=url, title=data['title'], min_time=data['min_time'], max_time=data['max_time'])
 
@@ -149,7 +143,7 @@ class SignUpView(View):
 
                     # 토큰을 담아서 응답
                     return JsonResponse({"token": token,
-                                        'private_pages': list(private_pages.objects.filter(url=page_serializer.data['url']).values()),
+                                        'private_pages': list(private_pages.objects.get(url=page_serializer.data['url']).values()),
                                          'calendar_dates': dates_info,
                                          'month': dates_month_info,
                                          'sigined_up_group_member_id': user.id},
@@ -164,16 +158,29 @@ class SignUpView(View):
             return JsonResponse({"message": "INVALID_KEYS"}, status=400)
 
 
-# @csrf_exempt
 class DatesView(View):
-    def get(self, request):
-        query_set = calendar_dates.objects.all()
-        serializer = GetDatesSerializer(query_set, many=True)
-        return JsonResponse(serializer.data, safe=False)
+    @login_decorator
+    def get(self, request, url):
+        try:
+            # 고유 url에 대한 private_pages 튜플 정보 가져옴
+            page = private_pages.objects.get(url=url)
+        except private_pages.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # 로그인한 회원이름 가져옴
+        access_token = request.headers.get('Authorization', None)
+        payload = jwt.decode(access_token, SECRET_KEY, ALGORITHM)
+        user = group_members.objects.get(
+            name=payload['name'], private_page_id=payload['private_page_id'])
+        print('ahead of return')
+        return JsonResponse({
+            'private_page': list(private_pages.objects.filter(url=page.url).values()),
+            'available_time': list(available_times.objects.filter(group_member_id=user.id).values())},
+            status=200)
 
 
 class MembersView(View):
-   # @ login_decorator
+    @ login_decorator
     def get(self, request):
         query_set = group_members.objects.all()
         serializer = GetMembersSerializer(query_set, many=True)
@@ -228,7 +235,7 @@ class SignInView(View):
 
 
 class RegisterView(View):
-    # @login_decorator
+    @login_decorator
     def get(self, request, url):
         try:
             # 고유 url에 대한 private_pages 튜플 정보 가져옴
