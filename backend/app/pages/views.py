@@ -100,8 +100,30 @@ class SignUpView(View):
         data = json.loads(request.body)
         page_serializer = GetPagesSerializer(page)
 
-        if group_members.objects.filter(name=data['name'], private_page_id=page_serializer.data['id']).exists() != False:
-            return HttpResponse('Alreay existed')
+        # 고유한 페이지에 이미 회원이름이 존재한다면
+        if group_members.objects.filter(name=data['name'], private_page_id=page_serializer.data['id']).exists():
+            print("user exist")
+            user = group_members.objects.get(
+                name=data['name'], private_page_id=page_serializer.data['id'])
+
+            if data['password'] == user.password:
+                print("password correct")
+                dates_info = list(
+                    calendar_dates.objects.filter(private_page_id=page_serializer.data['id']).values())
+                dates_month_info = [
+                    date['month'] for date in dates_info]
+                dates_month_info = sorted(list(set(dates_month_info)))
+
+                token = jwt.encode(
+                    {'name': data['name'], 'private_page_id': page_serializer.data['id']}, SECRET_KEY, ALGORITHM)
+                return JsonResponse({"token": token,
+                                    'private_pages': list(private_pages.objects.filter(url=page_serializer.data['url']).values()),
+                                     'calendar_dates': dates_info,
+                                     'month': dates_month_info,
+                                     'group_member_id': user.id},
+                                    status=200)
+            else:
+                return HttpResponse('Invalid password. Please try again.')
 
         # 회원가입
         group_members.objects.create(
