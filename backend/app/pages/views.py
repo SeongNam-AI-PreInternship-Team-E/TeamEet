@@ -158,6 +158,7 @@ class SignUpView(View):
             return JsonResponse({"message": "INVALID_KEYS"}, status=400)
 
 
+# 내가 선택한 일정 정보 조회
 class DatesView(View):
     @login_decorator
     def get(self, request, url):
@@ -166,17 +167,52 @@ class DatesView(View):
             page = private_pages.objects.get(url=url)
         except private_pages.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
+        page_serializer = GetPagesSerializer(page)
         # 로그인한 회원이름 가져옴
         access_token = request.headers.get('Authorization', None)
         payload = jwt.decode(access_token, SECRET_KEY, ALGORITHM)
         user = group_members.objects.get(
             name=payload['name'], private_page_id=payload['private_page_id'])
-        print('ahead of return')
-        return JsonResponse({
-            'private_page': list(private_pages.objects.filter(url=page.url).values()),
-            'available_time': list(available_times.objects.filter(group_member_id=user.id).values())},
-            status=200)
+
+        user_serializer = GetMembersSerializer(user)
+
+        sql_calendar_times = available_times.objects.raw('''select available_times.id, available_times.group_member_id, calendar_dates.year,
+            calendar_dates.month, calendar_dates.day,
+            calendar_dates.day_of_week, available_times.time
+            from available_times, calendar_dates
+            where available_times.calendar_date_id=calendar_dates.id and
+            calendar_dates.private_page_id=\"'''+str(page_serializer.data['id'])+'\"')
+
+        my_schedule = defaultdict(list)
+
+        dates_info = list()  # 내가 선택한 일자 저장
+        for row in sql_calendar_times:
+            # JSON 응답에 들어갈 회원 PK값 추가
+            my_schedule['group_member_id'] = row.group_member_id
+
+            date = row.year+'-'+row.month+'-'+row.day+'-'+row.day_of_week
+            dates_info.append(date)
+        date_info = sorted(list(set(dates_info)))  # 중복되는 선택한 일자 제거
+
+        available_time = list()
+        for date_info in dates_info:
+            date_time = defaultdict(int)
+            times_info = list()  # 내가 선택한 일자의 가능한 시간대
+            for row in sql_calendar_times:
+                date = row.year+'-'+row.month+'-'+row.day+'-'+row.day_of_week
+                if date == date_info:
+                    times_info.append(float(row.time))
+            date_time['date'] = date_info
+            date_time['time'] = sorted(times_info)
+
+            available_time.append(date_time)
+        # 리스트 내 중복된 딕셔너리 요소 제거
+        available_time_unique = list(
+            {key['date']: key for key in available_time}.values())
+        my_schedule['available_time'] = available_time_unique
+
+        return JsonResponse(my_schedule,
+                            status=200)
 
 
 class MembersView(View):
@@ -235,7 +271,7 @@ class SignInView(View):
 
 
 class RegisterView(View):
-    @login_decorator
+    @ login_decorator
     def get(self, request, url):
         try:
             # 고유 url에 대한 private_pages 튜플 정보 가져옴
