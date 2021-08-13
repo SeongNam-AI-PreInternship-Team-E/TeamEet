@@ -373,3 +373,15 @@ class RegisterView(View):
                                                 ]['count'].append(int(time_count[time_count_key]))
 
         return JsonResponse(group_info, status=200)
+
+    @ login_decorator
+    def put(self, request, url):
+        try:
+            # 고유 url에 대한 private_pages 튜플 정보 가져옴
+            page = private_pages.objects.get(url=url)
+        except private_pages.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # url, year, month, day, day_of_week, name, start/end_time
+        data = json.loads(request.body)
+        page_serializer = GetPagesSerializer(page)
