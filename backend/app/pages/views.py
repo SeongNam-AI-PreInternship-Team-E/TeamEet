@@ -421,3 +421,86 @@ class RegisterView(View):
         # url, year, month, day, day_of_week, name, start/end_time
         data = json.loads(request.body)
         page_serializer = GetPagesSerializer(page)
+
+        access_token = request.headers.get('Authorization', None)
+        payload = jwt.decode(access_token, SECRET_KEY, ALGORITHM)
+        user = group_members.objects.get(
+            name=payload['name'], private_page_id=payload['private_page_id'])
+
+        user_serializer = GetMembersSerializer(user)
+
+        sql_query_set = available_times.objects.raw('''select id, calendar_date_id, time
+                                                        from available_times
+                                                        where group_member_id=\"'''+str(user_serializer.data['id'])+'\"')
+        #기존 일자 전체 삭제
+        
+        for query in sql_query_set:
+            # 기존의 일자 정보 추출
+            if calendar_dates.objects.filter(id=query.calendar_date_id).exists():
+                date = calendar_dates.objects.get(
+                    id=query.calendar_date_id)
+                date_serializer = GetDatesSerializer(date)
+                date_id = date_serializer.data['id']
+            else:
+                return HttpResponse('date doesn\'t exist')
+
+            # 기존에 가지고 있는 일자 중 새로 들어오는 time 값은 저장 & 들어오지 않은 time 값은 삭제
+            if available_times.objects.filter(calendar_date_id=date_id).exists():
+                print('기존 일자의 time 값이 존재합니다')
+                
+            print(query.calendar_date_id, query.time)
+
+        #calendar_date_id  and time
+
+        # return JsonResponse({'private_pages': list(sql_query_set.values())}, status=200)
+        return HttpResponse('sucessfully put')
+
+
+##########   Request    #############
+# {
+#     "calendar_dates": [
+#         {
+#             "year": "2021",
+#             "month": "6",
+#             "day": "29",
+#             "time": "9"
+#         },
+#         {
+#             "year": "2021",
+#             "month": "6",
+#             "day": "29",
+#             "time": "8.5"
+#         },
+#         {
+#             "year": "2021",
+#             "month": "6",
+#             "day": "30",
+#             "time": "9"
+#         },
+#         {
+#             "year": "2021",
+#             "month": "7",
+#             "day": "1",
+#             "time": "5"
+#         }
+#     ]
+# }
+##########   Response    #############
+
+# {
+#     "group_member_id": 1,
+#     "available_time": [
+#         {
+#             "date": "2021-6-29-Tue",
+#             "time": [ 8.5, 9.0 ]
+#         },
+#         {
+#             "date": "2021-6-30-Wed",
+#             "time": [ 9.0 ]
+#         },
+#         {
+#             "date": "2021-7-1-Thu",
+#             "time": [ 5.0 ]
+#         }
+#     ]
+# }
