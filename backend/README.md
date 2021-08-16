@@ -26,12 +26,14 @@
 - title(string) : 모임명
 - min_time(string) : 일정 시작 시간
 - max_time(string) : 일정 마감 시간
-- calendar_dates(list) : 선택한 캘린더 일자 정보 | 각각 인덱스마다 딕셔너리 타입을 가지는 리스트
+- calendar_dates(list) : 선택한 캘린더 일자 정보 | 각 인덱스마다 딕셔너리 타입을 가지는 리스트
   - [리스트 내부 각 인덱스의 딕셔너리 키]
   - year(string) : 년
   - month(string) : 월
   - day(string) : 일
   - day_of_week(string) : 요일
+
+<br>
 
 ### **출력필드**
 
@@ -56,7 +58,7 @@
 
 <br>
 
-> ### http://localhost:8000/pages/<url:str>
+> ### http://localhost:8000/pages/\<url:str\>
 
 <br>
 
@@ -101,3 +103,38 @@
   - private_page_id(int) : 종속된 페이지의 PK 값 | FK
 - month(list) : 선택한 일자가 포함된 달 | 인덱스마다 string 타입을 가짐
 - group_member_id(int) : 사용자의 PK 값
+
+<br>
+
+## **내가 선택한 일정 정보 보내기 [POST]**
+
+<br>
+
+> ### http://localhost:8000/pages/\<url:str\>/register/
+
+<br>
+
+### **기능**
+
+- 해당 페이지에 종속된 사용자가 로그인되어 있을 때에만 사용할 수 있게 해야한다.
+- 요일 별 본인이 가능한 시간대를 선택하고 등록하기 버튼을 누르면 일정 등록 API를 호출한다.
+
+<br>
+
+### **입력필드**
+
+- calendar_dates(list) : 선택한 캘린더 일자 정보 | 각 인덱스마다 딕셔너리 타입을 가지는 리스트
+  - [리스트 내부 각 인덱스의 딕셔너리 키]
+  - year(string) : 년
+  - month(string) : 월
+  - day(string) : 일
+  - time(string) : 모임이 가능한 시간대 | 24시를 기준으로 하고 0.5시간 단위를 가진다.
+
+<br>
+
+### **출력필드**
+
+- selected_month(dict) : 선택한 달
+  - selected_day(dict) : 선택한 일자
+    - avail_time(list) : 모임이 가능한 시간대 | 각 인덱스마다 int 타입을 가지는 리스트
+    - count(list) : 시간대별 사용자들이 선택한 수 | 각 인덱스마다 int 타입을 가지는 리스트
