@@ -58,7 +58,7 @@
 
 <br>
 
-> ### http://localhost:8000/pages/\<url:str\>
+> ### http://localhost:8000/pages/<url:str>
 
 <br>
 
@@ -110,7 +110,7 @@
 
 <br>
 
-> ### http://localhost:8000/pages/\<url:str\>/register/
+> ### http://localhost:8000/pages/<url:str>/register/
 
 <br>
 
