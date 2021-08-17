@@ -429,78 +429,69 @@ class RegisterView(View):
 
         user_serializer = GetMembersSerializer(user)
 
+        # 기존 일자 전체 삭제
         sql_query_set = available_times.objects.raw('''select id, calendar_date_id, time
                                                         from available_times
                                                         where group_member_id=\"'''+str(user_serializer.data['id'])+'\"')
-        #기존 일자 전체 삭제
-        
+
         for query in sql_query_set:
-            # 기존의 일자 정보 추출
-            if calendar_dates.objects.filter(id=query.calendar_date_id).exists():
-                date = calendar_dates.objects.get(
-                    id=query.calendar_date_id)
-                date_serializer = GetDatesSerializer(date)
-                date_id = date_serializer.data['id']
+            query.delete()
+            print('Delete successfully')
+
+            #일정표에서 일자별로 선택된 시간대(time) DB에 저장하기#
+        # request에서 key 중 값들을 또 다른 객체들로 받는 "calendar_dates"로 value값 확인 -> 각 객체는 "year","month","day","time"이라는 키들을 가짐.
+        for dates in data['calendar_dates']:
+            # 특정 페이지 내부에 request에서 받아온 일자에 해당하는 키의 값이 존재하는지 확인
+            if calendar_dates.objects.filter(
+                    private_page_id=page_serializer.data['id'], year=dates['year'], month=dates['month'], day=dates['day']).exists():
+                # 일자 까지 조회
+                calendar_date = calendar_dates.objects.filter(
+                    private_page_id=page_serializer.data['id'], year=dates['year'], month=dates['month'], day=dates['day'])
+
+                # calendar_date가 쿼리셋이기 때문에 해당 쿼리셋의 calendar_dates의 id 값을 추출하기 위한 for문
+                for date in calendar_date:
+                    date_id = date.id
+                    print(date_id)
+                    if available_times.objects.filter(group_member_id=user_serializer.data['id'], calendar_date_id=date_id, time=dates['time']).exists() == 0:
+                        available_times.objects.create(
+                            group_member_id=user_serializer.data['id'], calendar_date_id=date_id, time=dates['time'])
             else:
-                return HttpResponse('date doesn\'t exist')
+                return HttpResponse('calendar_dates is empty')
 
-            # 기존에 가지고 있는 일자 중 새로 들어오는 time 값은 저장 & 들어오지 않은 time 값은 삭제
-            if available_times.objects.filter(calendar_date_id=date_id).exists():
-                print('기존 일자의 time 값이 존재합니다')
-                
-            print(query.calendar_date_id, query.time)
+        sql_query_set = available_times.objects.raw(
+            'select available_times.id, year, month, day, name, time, group_members.private_page_id from available_times join calendar_dates on available_times.calendar_date_id = calendar_dates.id join group_members on available_times.group_member_id = group_members.id where group_members.private_page_id=\"'+str(page_serializer.data['id'])+'\"')
 
-        #calendar_date_id  and time
+        group_info = defaultdict(list)
+        time_count = defaultdict(int)
+        for row in sql_query_set:
+            group_info['avail_month'].append(int(row.month))
+            group_info['avail_month'] = sorted(
+                list(set(group_info['avail_month'])))
+            group_info[row.month] = defaultdict(list)
+        for row in sql_query_set:
 
-        # return JsonResponse({'private_pages': list(sql_query_set.values())}, status=200)
-        return HttpResponse('sucessfully put')
+            group_info[row.month]['avail_date'].append(int(row.day))
+            group_info[row.month]['avail_date'] = sorted(
+                list(set(group_info[row.month]['avail_date'])))
+            group_info[row.month][row.day] = defaultdict(list)
+        for row in sql_query_set:
 
+            group_info[row.month][row.day]['avail_time'].append(
+                float(row.time))
+            group_info[row.month][row.day]['avail_time'] = sorted(
+                list(set(group_info[row.month][row.day]['avail_time'])))
+            group_info[row.month][row.day]['count'] = []
+            # key 값 생성
+            group_date = row.year+'-'+row.month+'-'+row.day+'-'+row.time
 
-##########   Request    #############
-# {
-#     "calendar_dates": [
-#         {
-#             "year": "2021",
-#             "month": "6",
-#             "day": "29",
-#             "time": "9"
-#         },
-#         {
-#             "year": "2021",
-#             "month": "6",
-#             "day": "29",
-#             "time": "8.5"
-#         },
-#         {
-#             "year": "2021",
-#             "month": "6",
-#             "day": "30",
-#             "time": "9"
-#         },
-#         {
-#             "year": "2021",
-#             "month": "7",
-#             "day": "1",
-#             "time": "5"
-#         }
-#     ]
-# }
-##########   Response    #############
+            # key-value 저장, 기존에 key값이 존재 한다면 value ++
+            time_count[group_date] += 1
 
-# {
-#     "group_member_id": 1,
-#     "available_time": [
-#         {
-#             "date": "2021-6-29-Tue",
-#             "time": [ 8.5, 9.0 ]
-#         },
-#         {
-#             "date": "2021-6-30-Wed",
-#             "time": [ 9.0 ]
-#         },
-#         {
-#             "date": "2021-7-1-Thu",
-#             "time": [ 5.0 ]
-#         }
-#     ]
-# }
+        time_count_keys = list(time_count.keys())
+
+        for time_count_key in time_count_keys:
+            time_count_key_index = time_count_key.split('-')
+            group_info[time_count_key_index[1]][time_count_key_index[2]
+                                                ]['count'].append(int(time_count[time_count_key]))
+
+        return JsonResponse(group_info, status=200)
