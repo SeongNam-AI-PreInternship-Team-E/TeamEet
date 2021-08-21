@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
-
+from app import secret_key
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 DB_DIR = '/var/teemeet/database'
@@ -22,31 +22,31 @@ DB_DIR = '/var/teemeet/database'
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-mp4m&^+r36$507ucoyibbown0(@%h@fxvjm%gtl@+4k6((w%cs'
-SECRET_KEY = os.environ.get(
-    'SECRET_KEY', 'django-insecure-mp4m&^+r36$507ucoyibbown0(@%h@fxvjm%gtl@+4k6((w%cs')
-ALGORITHM = 'HS256'
+SECRET_KEY = secret_key.SECRET_KEY
+ALGORITHM = os.environ.get("JWT_ALGORITHM")
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = False
 # DEBUG = int(os.environ.get("DEBUG", default=1))
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-#ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
-
 
 # Application definition
-
 INSTALLED_APPS = [
+    #Local_Apps
+    'pages',
+
+    #Third_Party_Apps
+    'rest_framework',
+    'corsheaders',
+
+    #Django_Apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'pages',
-    'corsheaders'
 ]
 # API 호출을 할 때 Web UI 와 JSON 형식 두가지로 보이는데 JSON 형식으로만 보이도록 옵션 설정
 # REST_FRAMEWORK = {
@@ -66,7 +66,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 # CORS 관련 추가
-CORS_ORIGIN_WHITELIST = ['http://www.himyteamnew.ml/', 'http://himyteamnew.ml/']
+# CORS_ORIGIN_WHITELIST = ['http://www.himyteamnew.ml/', 'http://himyteamnew.ml/']
 CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'app.urls'
