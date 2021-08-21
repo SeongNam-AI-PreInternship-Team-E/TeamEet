@@ -1,11 +1,24 @@
 version: "3.3"
 
 services:
-
+  # nginx:
+  #   image: nginx:latest
+  #   ports:
+  #     - "80:80"
+  #     - "8000:8000"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #   depends_on:
+  #     - react
+  #     - flask_app
+  #   networks:
+  #     - app-tier
+  #   restart: "on-failure"
   nginx:
     image: jwilder/nginx-proxy
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
+      - "./log:/var/log/nginx"
     ports:
       - 80:80
       - 443:443
@@ -27,7 +40,26 @@ services:
     stdin_open: true             # react-script 3.4.1 부터 필요
     tty: true
     entrypoint: ["yarn", "start"]
-
+  # react:
+  #   build:
+  #     context: ./frontend
+  #   container_name: react
+  #   ports:
+  #     - 3000:3000
+  #   volumes:
+  #     - "./:/usr/src/app/"
+  #     - "/usr/src/app/frontend/node_modules"
+  #   stdin_open: true # react-script 3.4.1 부터 필요
+  #   tty: true
+  #   networks:
+  #     - app-tier
+  #   restart: always
+  #   environment:
+  #     # - VIRTUAL_HOST=himyteamnew.ml, www.himyteamnew.ml
+  #     - NODE_ENV=development
+  #     - CHOKIDAR_USEPOLLING=true # HMR을 위해 필요한 설정
+  #   depends_on:
+  #     - flask_app
 
   web:
     build:
@@ -41,6 +73,7 @@ services:
     restart: always
     volumes:
       - ./backend/app:/app
+      - ./backend/db:/var/teemeet/db
     env_file:
       # - ./backend/.env.dev
       - ./backend/.env

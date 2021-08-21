@@ -15,6 +15,7 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+DB_DIR = '/var/teemeet/database'
 
 
 # Quick-start development settings - unsuitable for production
@@ -27,7 +28,8 @@ SECRET_KEY = os.environ.get(
 ALGORITHM = 'HS256'
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = False
-DEBUG = int(os.environ.get("DEBUG", default=1))
+# DEBUG = int(os.environ.get("DEBUG", default=1))
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 #ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
@@ -101,7 +103,7 @@ if DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'NAME': f'{DB_DIR}/db.sqlite3',
         }
     }
 else:
