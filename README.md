@@ -6,17 +6,17 @@
 팀원 간 일정 공유를 통해 미팅 시간을 조율해 주는 웹사이트입니다.  
 HTTP API 방식으로 JSON을 결과값으로 출력합니다.
 
+[Software Design DoC 및 개발 일지](https://www.notion.so/SW-Design-DOC-0d2c078c9efa4698bb48d5a31a3abc8b)  
+[API 문서화](https://documenter.getpostman.com/view/13993198/TzedgQAx)
+
+<br>
+
 ## **Update**
 
 - 앱으로 타깃을 변경하여 React Native 기반 앱으로 변경 하였습니다.
 - [Github](https://github.com/Join2Gather/WeMeet)
 - [🍎 App Store](https://apps.apple.com/kr/app/we-meet/id1610966012)
 - [🤖 Play Store](https://play.google.com/store/apps/details?id=com.ww8007.weMeet)
-
-[Software Design DoC 및 개발 일지](https://www.notion.so/SW-Design-DOC-0d2c078c9efa4698bb48d5a31a3abc8b)  
-[API 문서화](https://documenter.getpostman.com/view/13993198/TzedgQAx)
-
-<br>
 
 ## **Front-End**
 
